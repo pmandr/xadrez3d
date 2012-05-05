@@ -24,10 +24,14 @@ public class Knight extends Piece {
         List<Square> moves = new ArrayList<Square>();
 
         for (i = -2; i <= 2; i++) {
-            if(i == 0) continue;
+            if (i == 0) {
+                continue;
+            }
             for (j = -2; j <= 2; j++) {
                 if (Math.abs(i) != Math.abs(j)) {
-                    if(j == 0) continue;
+                    if (j == 0) {
+                        continue;
+                    }
                     try {
                         moves.add(new Square(x + i, y + j));
                     } catch (InvalidSquareException ex) {
