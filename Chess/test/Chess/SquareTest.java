@@ -4,6 +4,7 @@
  */
 package Chess;
 
+import Chess.exception.InvalidSquareException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -34,40 +35,53 @@ public class SquareTest {
     
 
     @Test
-    public void SquareGetXCheck() {
+    public void SquareGetXCheck() throws InvalidSquareException {
         Square s1 = new Square("a1");
         Square s2 = new Square("h5");
+        try {
         Square s3 = new Square("66");
         Square s4 = new Square("{{");
+        fail("Expected exception not thrown");
+        }
+        catch(InvalidSquareException e) {
+  
+        }
         assertEquals(0, s1.getX());
         assertEquals(7, s2.getX());
-        assertEquals(0, s3.getX());
-        assertEquals(7, s4.getX());
-    }
-    
-    @Test
-    public void SquareGetYCheck() {
-        Square s1 = new Square("a1");
-        Square s2 = new Square("h5");
-        Square s3 = new Square("66");
-        Square s4 = new Square("{{");
-        assertEquals(0, s1.getY());
-        assertEquals(4, s2.getY());
-        assertEquals(5, s3.getY());
-        assertEquals(7, s4.getY());
 
     }
     
     @Test
-    public void SquareGetPosCheck() {
+    public void SquareGetYCheck() throws InvalidSquareException {
         Square s1 = new Square("a1");
         Square s2 = new Square("h5");
+        try {
         Square s3 = new Square("66");
         Square s4 = new Square("{{");
+        fail("Expected exception not thrown");
+        }
+        catch(InvalidSquareException e) {
+  
+        }
+        assertEquals(0, s1.getY());
+        assertEquals(4, s2.getY());
+
+    }
+    
+    @Test
+    public void SquareGetPosCheck() throws InvalidSquareException {
+        Square s1 = new Square("a1");
+        Square s2 = new Square("h5");
+        try {
+        Square s3 = new Square("66");
+        Square s4 = new Square("{{");
+        fail("Expected exception not thrown");
+        }
+        catch(InvalidSquareException e) {
+  
+        }
         assertEquals("a1", s1.getPos());
         assertEquals("h5", s2.getPos());
-        assertEquals("a6", s3.getPos());
-        assertEquals("h8", s4.getPos());
 
     }
 }
