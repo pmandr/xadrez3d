@@ -27,14 +27,14 @@ public class Model {
     
     public Model(String filename) throws IOException {
         this.name = filename;
-        this.obj = new Loader(new File("models/" + filename + ".obj"));
+        this.obj = new Loader(new File("src/models/" + filename + ".obj"));
         this.setDefaults();
 
     }
 
     public Model(String name, String filename) throws IOException {
         this.name = name;
-        this.obj = new Loader(new File("models/" + filename +  ".obj"));
+        this.obj = new Loader(new File("src/models/" + filename +  ".obj"));
         this.setDefaults();
     }
     

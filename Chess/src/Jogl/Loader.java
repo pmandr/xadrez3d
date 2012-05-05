@@ -1228,7 +1228,7 @@ public class Loader {
     protected void readMTL(String name) throws IOException {
         System.out.println(name);
         int nummaterials_aux, numtextures_aux;
-        File file = new File("models/" + name);
+        File file = new File("src/models/" + name);
 
         if (file.exists()) {
             BufferedReader in = null;
