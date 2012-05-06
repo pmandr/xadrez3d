@@ -1640,7 +1640,7 @@ public class Loader {
 
     /**
      * Method used to draw an object. The method compile() should be previously
-     * called to create the disply list.
+     * called to create the display list.
      *
      * @param gLAutoDrawable The OpenGL context to draw.
      */

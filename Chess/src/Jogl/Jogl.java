@@ -1,7 +1,9 @@
 package Jogl;
 
-import Game.Game;
+import Game.*;
 import com.sun.opengl.util.Animator;
+import com.sun.opengl.util.FPSAnimator;
+import com.sun.opengl.util.GLUT;
 import java.awt.Frame;
 import java.awt.MouseInfo;
 import java.awt.PointerInfo;
@@ -12,18 +14,21 @@ import java.util.logging.Logger;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 
+
 /**
  * Chess.java <BR> author: Brian Paul (converted to Java by Ron Cemer and Sven
  * Goethel) <P>
  *
  * This version is equal to Brian Paul's version 1.2 1999/10/21
  */
-public class Jogl extends KeyAdapter implements GLEventListener, MouseMotionListener {
+public class Jogl implements GLEventListener {
 
-    private static Camera camera;
-    public static int width;
-    public static int height;
+    private static Camera camera = new Camera();;
+    private static int width =800;
+    private static int height=600;
     private GLU glu;
+    private static Jogl renderer = new Jogl();
+    private static Listener listener = new Listener(camera);
 
 
     public static void main(String[] args) throws IOException {
@@ -31,21 +36,18 @@ public class Jogl extends KeyAdapter implements GLEventListener, MouseMotionList
         Game.createBoard();
         //acelera o rendering   
 
-        camera = new Camera();
-
-        Jogl.width = 1280;
-        Jogl.height = 960;
         GLCapabilities caps = new GLCapabilities();
         caps.setDoubleBuffered(true);
         caps.setHardwareAccelerated(true);
         GLCanvas canvas = new GLCanvas(caps);
-        Jogl j = new Jogl();
-        canvas.addGLEventListener(j);
+        
+        
+        canvas.addGLEventListener(renderer);
         Frame frame = new Frame("Simple JOGL Application");
         frame.add(canvas);
-        frame.setSize(1280, 960);
-        final Animator animator = new Animator(canvas);
-        frame.addKeyListener(j);
+        frame.setSize(Jogl.width, Jogl.height);
+        final FPSAnimator animator = new FPSAnimator(canvas,60);
+        frame.addKeyListener(listener);
         frame.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -73,7 +75,7 @@ public class Jogl extends KeyAdapter implements GLEventListener, MouseMotionList
         GL gl = drawable.getGL();
         glu = new GLU();
         System.err.println("INIT GL IS: " + gl.getClass().getName());
-        drawable.addMouseMotionListener(this);
+        drawable.addMouseMotionListener(listener);
         // Enable VSync
         gl.setSwapInterval(1);
         gl.glEnable(GL.GL_LIGHTING);
@@ -84,13 +86,11 @@ public class Jogl extends KeyAdapter implements GLEventListener, MouseMotionList
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         Game.compileModels(drawable);
-        lighting(drawable);
+        lighting(gl);
 
     }
 
-    private void lighting(GLAutoDrawable drawable) {
-        GL gl = drawable.getGL();
-
+    private void lighting(GL gl) {
         float[] ambient = {0.3f, 0.3f, 0.3f, 1.0f};
         float[] diffuse = new float[]{0.75f, 0.75f, 0.75f, 1.0f};
         float[] specular = new float[]{0.7f, 0.7f, 0.7f, 1.0f};
@@ -135,73 +135,80 @@ public class Jogl extends KeyAdapter implements GLEventListener, MouseMotionList
         gl.glMatrixMode(GL.GL_PROJECTION);					// Select The Projection Matrix
         gl.glLoadIdentity();							// Reset The Projection Matrix
         glu.gluPerspective(45.0, (float)width/(float)height, 1, 50);
-        glu.gluLookAt(camera.getEyeX(), camera.getEyeY(), camera.getEyeZ(),
-                camera.getPosX(), camera.getPosY(), camera.getPosZ(),
+        glu.gluLookAt(camera.getPosX(), camera.getPosY(), camera.getPosZ(),
+                camera.getLookAtPointX(), camera.getLookAtPointY(), camera.getLookAtPointZ(),
                 camera.getUpX(), camera.getUpY(), camera.getUpZ());
+//        glu.gluLookAt(10, 10, 10, 0,0,0,0,1,0);
         
         //define que a matrix é a de modelo
         gl.glMatrixMode(GL.GL_MODELVIEW);					// Select The Modelview Matrix
         gl.glLoadIdentity();
-        gl.glTranslatef(-1.5f, -1.58f, -6.0f);
-        gl.glScalef(6.0f, 6.0f, 6.0f);
-
+        
+//        gl.glTranslatef(-4.0f, 0.0f, -4.0f); 
+        gl.glScalef(8.0f, 8.0f, 8.0f);//o tamanho do tabuleiro fica 16x16
+        gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
         Game.board.draw(drawable);
+        
         gl.glLoadIdentity();
-        gl.glTranslatef(-1.5f, 0.0f, -6.0f);
-
-        Game.models.get("dark_rook").draw(drawable);
+        gl.glTranslatef(0.0f, 0.0f, 0.0f);
+        //Game.models.get("dark_rook").draw(drawable);
+        
+        gl.glLoadIdentity();
+        DrawXYZAxis(gl);
         //força o desenho das primitivas
         gl.glFlush();
     }
 
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W://faz zoom-in
-                camera.moveFront();
-                break;
-            case KeyEvent.VK_S://faz zoom-out
-                camera.moveBack();
-                break;
-            case KeyEvent.VK_A://faz zoom-out
-                camera.strafeRight();
-                break;
-            case KeyEvent.VK_D://faz zoom-out
-                camera.strafeLeft();
-                break;
-            case KeyEvent.VK_J://faz zoom-out
-                camera.moveUp();
-                break;
-            case KeyEvent.VK_K://faz zoom-out
-                camera.moveDown();
-                break;
+    
+    public void DrawXYZAxis(GL gl){
+           GLUT glut = new GLUT();
+                //X Axis
+            gl.glLineWidth(3.0f);
+            gl.glRasterPos3f(0.0f, 0.0f, 0.0f);   
+            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_10, "x");
+                gl.glBegin(GL.GL_LINES);
+                        gl.glColor3f(0.0f,1.0f,0.0f);
+                        gl.glVertex3f(0,0,0);
+                        gl.glVertex3f(20,0,0);
+                gl.glEnd();
+                        
+//            gl.glBegin(GL.GL_TRIANGLES); 
+//              gl.glVertex3f(1.0f, 0.05f, 0.0f);
+//              gl.glVertex3f(1.0f, -0.05f, 0.0f);
+//              gl.glVertex3f(1.1f, 0.0f, 0.0f);
+//            gl.glEnd();
+            
+            //Y Axis
+            gl.glRasterPos3f(0.0f, 1.2f, 0.0f);    
+            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_10, "y");
+            gl.glBegin(GL.GL_LINES);
+                        gl.glColor3f(0,1,0);
+                        gl.glVertex3f(0,0,0);
+                        gl.glVertex3f(0,20,0);
+                gl.glEnd();
+//                gl.glBegin(GL.GL_TRIANGLES); 
+//              gl.glVertex3f(-0.05f, 1f, 0.0f);
+//              gl.glVertex3f(0.05f, 1f, 0.0f);
+//              gl.glVertex3f(0.0f, 1.1f, 0.0f);
+//            gl.glEnd();
+                
+                //Z Axis
+            gl.glRasterPos3f(0.0f, 0.0f, 1.2f);    
+            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_10, "z");
+            gl.glBegin(GL.GL_LINES);
+                        gl.glColor3f(0,0,1);
+                        gl.glVertex3f(0,0,0);
+                        gl.glVertex3f(0,0,20);
+            gl.glEnd();
+            
+//            gl.glBegin(GL.GL_TRIANGLES); 
+//              gl.glVertex3f(0.0f, 0.05f, 1.0f);
+//              gl.glVertex3f(0.0f, -0.05f, 1.0f);
+//              gl.glVertex3f(0.0f, 0.0f, 1.1f);
+//            gl.glEnd();
+                
         }
-    }
-
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    public void mouseMoved(MouseEvent e) {
-        camera.rot += (e.getX() - camera.lastx > 0)? 0.01f : -0.01f;
-        camera.pitch += (e.getY() - camera.lasty > 0)? 0.01f : -0.01f;
-
-	if(camera.rot > 2*Math.PI)
-		camera.rot -= 2*Math.PI;
-	if(camera.rot < 0)
-		camera.rot += 2*Math.PI;
-
-
-	if(camera.pitch > (float)(Math.PI/2))
-		camera.pitch = (float)(Math.PI/2);
-	if(camera.pitch < (float)-(Math.PI/2))
-		camera.pitch = (float)-(Math.PI/2);
-        camera.lastx = e.getX();
-        camera.lasty = e.getY();
-    camera.update();
-
-    }
+    
 }
