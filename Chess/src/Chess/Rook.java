@@ -4,10 +4,40 @@
  */
 package Chess;
 
+import Chess.exception.InvalidSquareException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Lobosque
  */
 public class Rook extends Piece {
-    
+
+    protected static List<Square> possibleMoves(Square pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int i, j;
+        List<Square> moves = new ArrayList<Square>();
+
+        for (i = 0; i <= 7; i++) {
+            if (i == x) {
+                continue;
+            }
+            try {
+                moves.add(new Square(i, y));
+            } catch (InvalidSquareException ex) {
+            }
+        }
+        for (i = 0; i <= 7; i++) {
+            if (i == y) {
+                continue;
+            }
+            try {
+                moves.add(new Square(x,i));
+            } catch (InvalidSquareException ex) {
+            }
+        }
+        return moves;
+    }
 }
