@@ -86,21 +86,19 @@ public class Camera {
     }
     
     public void updateTransition(){
-        if(this.transition){
-            if(this.player==1 ) {
-                if(!isAtPlayer2Position()) this.PosX+=1.0f;
-                else{
-                    this.transition = false;
-                    this.player =2;
-                }
+        if(this.player==1 ) {
+            if(!isAtPlayer2Position()) this.PosX+=1.0f;
+            else{
+                this.transition = false;
+                this.player =2;
             }
-            //if the current player is the p2
-            else if(!isAtPlayer1Position()) this.PosX-=1.0f;
-                   else {
-                    this.transition = false;
-                    this.player = 1;
-                    }
         }
+        //if the current player is the p2
+        else if(!isAtPlayer1Position()) this.PosX-=1.0f;
+                else {
+                this.transition = false;
+                this.player = 1;
+                }
     }
     
     public boolean isInTransition(){
