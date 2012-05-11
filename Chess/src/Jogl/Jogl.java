@@ -23,7 +23,7 @@ import javax.media.opengl.glu.GLU;
  */
 public class Jogl implements GLEventListener {
 
-    private static Camera camera = new Camera();;
+    private static Camera camera = new Camera();
     private static int width =800;
     private static int height=600;
     private GLU glu;
@@ -83,7 +83,7 @@ public class Jogl implements GLEventListener {
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glShadeModel(GL.GL_SMOOTH);
         // Setup the drawing area and shading mode
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        gl.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
         Game.compileModels(drawable);
         lighting(gl);
@@ -92,9 +92,10 @@ public class Jogl implements GLEventListener {
 
     private void lighting(GL gl) {
         float[] ambient = {0.3f, 0.3f, 0.3f, 1.0f};
-        float[] diffuse = new float[]{0.75f, 0.75f, 0.75f, 1.0f};
+        float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
         float[] specular = new float[]{0.7f, 0.7f, 0.7f, 1.0f};
         float[] position = new float[]{100, 10, 50, 1.0f};
+//        float[] position = new float[]{100, 10, 50, 1.0f};
 
         // Define os parametros da luz de numero 0
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, ambient, 0);
@@ -138,20 +139,114 @@ public class Jogl implements GLEventListener {
         glu.gluLookAt(camera.getPosX(), camera.getPosY(), camera.getPosZ(),
                 camera.getLookAtPointX(), camera.getLookAtPointY(), camera.getLookAtPointZ(),
                 camera.getUpX(), camera.getUpY(), camera.getUpZ());
-//        glu.gluLookAt(10, 10, 10, 0,0,0,0,1,0);
+//        glu.gluLookAt(-2, 1,-2, 8,0,8,0,1,0);
         
         //define que a matrix é a de modelo
         gl.glMatrixMode(GL.GL_MODELVIEW);					// Select The Modelview Matrix
         gl.glLoadIdentity();
-        
-//        gl.glTranslatef(-4.0f, 0.0f, -4.0f); 
-        gl.glScalef(8.0f, 8.0f, 8.0f);//o tamanho do tabuleiro fica 16x16
+        float proportionality = (float) (21.1/19.5);//proporcao entre tamanho de todo tabuleiro e soh a a area das pecas dentro dele
+        gl.glTranslatef(-(16*proportionality-16.0f)/2, 0.0f, -(16*proportionality-16.0f)/2);//coloca as bordas para fora do plano cartesiano positivo
+        gl.glScalef((8*proportionality),0.10f,(8*proportionality));//o tamanho do tabuleiro(parte dos quadrados) fica 16x16
         gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
         Game.board.draw(drawable);
         
+        //INICIALIZA PEÇAS... TEM Q MUDAR PARA UMA FUNCAO EM BOARD OU GAME??
         gl.glLoadIdentity();
-        gl.glTranslatef(0.0f, 0.0f, 0.0f);
-        //Game.models.get("dark_rook").draw(drawable);
+        gl.glTranslatef(1.0f, 1.0f, 1.0f);
+        Game.models.get("light_rook").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 3.0f);
+        Game.models.get("light_knight").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 5.0f);
+        Game.models.get("light_bishop").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 7.0f);
+        Game.models.get("light_queen").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 9.0f);
+        Game.models.get("light_king").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 11.0f);
+        Game.models.get("light_bishop").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 13.0f);
+        Game.models.get("light_knight").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(1.0f, 1.0f, 15.0f);
+        Game.models.get("light_rook").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 1.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 3.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 5.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 7.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 9.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 11.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 13.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(3.0f, 1.0f, 15.0f);
+        Game.models.get("light_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 1.0f);
+        Game.models.get("dark_rook").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 3.0f);
+        Game.models.get("dark_knight").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 5.0f);
+        Game.models.get("dark_bishop").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 7.0f);
+        Game.models.get("dark_queen").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 9.0f);
+        Game.models.get("dark_king").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 11.0f);
+        Game.models.get("dark_bishop").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 13.0f);
+        Game.models.get("dark_knight").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(15.0f, 1.0f, 15.0f);
+        Game.models.get("dark_rook").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 1.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 3.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 5.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 7.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 9.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 11.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 13.0f);
+        Game.models.get("dark_pawn").draw(drawable);
+        gl.glLoadIdentity();
+        gl.glTranslatef(13.0f, 1.0f, 15.0f);
+        Game.models.get("dark_pawn").draw(drawable);
         
         gl.glLoadIdentity();
         DrawXYZAxis(gl);
@@ -167,47 +262,31 @@ public class Jogl implements GLEventListener {
                 //X Axis
             gl.glLineWidth(3.0f);
             gl.glRasterPos3f(0.0f, 0.0f, 0.0f);   
-            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_10, "x");
+            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_24, "x");
                 gl.glBegin(GL.GL_LINES);
                         gl.glColor3f(0.0f,1.0f,0.0f);
                         gl.glVertex3f(0,0,0);
                         gl.glVertex3f(20,0,0);
                 gl.glEnd();
-                        
-//            gl.glBegin(GL.GL_TRIANGLES); 
-//              gl.glVertex3f(1.0f, 0.05f, 0.0f);
-//              gl.glVertex3f(1.0f, -0.05f, 0.0f);
-//              gl.glVertex3f(1.1f, 0.0f, 0.0f);
-//            gl.glEnd();
             
             //Y Axis
             gl.glRasterPos3f(0.0f, 1.2f, 0.0f);    
-            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_10, "y");
+            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_24, "y");
             gl.glBegin(GL.GL_LINES);
                         gl.glColor3f(0,1,0);
                         gl.glVertex3f(0,0,0);
                         gl.glVertex3f(0,20,0);
                 gl.glEnd();
-//                gl.glBegin(GL.GL_TRIANGLES); 
-//              gl.glVertex3f(-0.05f, 1f, 0.0f);
-//              gl.glVertex3f(0.05f, 1f, 0.0f);
-//              gl.glVertex3f(0.0f, 1.1f, 0.0f);
-//            gl.glEnd();
-                
+
                 //Z Axis
             gl.glRasterPos3f(0.0f, 0.0f, 1.2f);    
-            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_10, "z");
+            glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_24, "z");
             gl.glBegin(GL.GL_LINES);
                         gl.glColor3f(0,0,1);
                         gl.glVertex3f(0,0,0);
                         gl.glVertex3f(0,0,20);
             gl.glEnd();
-            
-//            gl.glBegin(GL.GL_TRIANGLES); 
-//              gl.glVertex3f(0.0f, 0.05f, 1.0f);
-//              gl.glVertex3f(0.0f, -0.05f, 1.0f);
-//              gl.glVertex3f(0.0f, 0.0f, 1.1f);
-//            gl.glEnd();
+ 
                 
         }
     

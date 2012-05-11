@@ -37,10 +37,10 @@ public class Listener extends KeyAdapter implements MouseMotionListener{
             case KeyEvent.VK_D://faz zoom-out
                 camera.strafeLeft();
                 break;
-            case KeyEvent.VK_J://faz zoom-out
+            case KeyEvent.VK_Q://faz zoom-out
                 camera.moveUp();
                 break;
-            case KeyEvent.VK_K://faz zoom-out
+            case KeyEvent.VK_E://faz zoom-out
                 camera.moveDown();
             case KeyEvent.VK_X:
                 camera.changePlayerView();
