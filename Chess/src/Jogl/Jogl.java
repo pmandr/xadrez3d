@@ -91,10 +91,10 @@ public class Jogl implements GLEventListener {
     }
 
     private void lighting(GL gl) {
-        float[] ambient = {0.3f, 0.3f, 0.3f, 1.0f};
-        float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
+        float[] ambient = {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] diffuse = new float[]{0.6f, 0.6f, 0.6f, 1.0f};
         float[] specular = new float[]{0.7f, 0.7f, 0.7f, 1.0f};
-        float[] position = new float[]{100, 10, 50, 1.0f};
+        float[] position = new float[]{8, 8, 50, 0.10f};
 //        float[] position = new float[]{100, 10, 50, 1.0f};
 
         // Define os parametros da luz de numero 0
@@ -106,9 +106,7 @@ public class Jogl implements GLEventListener {
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL gl = drawable.getGL();
-
         if (height <= 0) { // avoid a divide by zero error!
-
             height = 1;
         }
         final float h = (float) width / (float) height;
@@ -136,15 +134,18 @@ public class Jogl implements GLEventListener {
         gl.glMatrixMode(GL.GL_PROJECTION);					// Select The Projection Matrix
         gl.glLoadIdentity();							// Reset The Projection Matrix
         glu.gluPerspective(45.0, (float)width/(float)height, 1, 50);
+        
+        if(camera.isInTransition()) camera.updateTransition();
         glu.gluLookAt(camera.getPosX(), camera.getPosY(), camera.getPosZ(),
                 camera.getLookAtPointX(), camera.getLookAtPointY(), camera.getLookAtPointZ(),
                 camera.getUpX(), camera.getUpY(), camera.getUpZ());
 //        glu.gluLookAt(-2, 1,-2, 8,0,8,0,1,0);
+//        glu.gluLookAt(-10, 10,8, 8,0,8,0,1,0);
         
         //define que a matrix é a de modelo
         gl.glMatrixMode(GL.GL_MODELVIEW);					// Select The Modelview Matrix
         gl.glLoadIdentity();
-        float proportionality = (float) (21.1/19.5);//proporcao entre tamanho de todo tabuleiro e soh a a area das pecas dentro dele
+        float proportionality = (float) (21.2/19.5);//proporcao entre tamanho de todo tabuleiro e soh a a area das pecas dentro dele
         gl.glTranslatef(-(16*proportionality-16.0f)/2, 0.0f, -(16*proportionality-16.0f)/2);//coloca as bordas para fora do plano cartesiano positivo
         gl.glScalef((8*proportionality),0.10f,(8*proportionality));//o tamanho do tabuleiro(parte dos quadrados) fica 16x16
         gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
