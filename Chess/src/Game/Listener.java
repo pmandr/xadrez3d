@@ -26,24 +26,25 @@ public class Listener extends KeyAdapter implements MouseMotionListener{
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W://faz zoom-in
-                camera.moveFront();
                 break;
             case KeyEvent.VK_S://faz zoom-out
-                camera.moveBack();
                 break;
             case KeyEvent.VK_A://faz zoom-out
-                camera.strafeRight();
                 break;
             case KeyEvent.VK_D://faz zoom-out
-                camera.strafeLeft();
                 break;
             case KeyEvent.VK_Q://faz zoom-out
-                camera.moveUp();
                 break;
             case KeyEvent.VK_E://faz zoom-out
-                camera.moveDown();
+                break;
             case KeyEvent.VK_X:
-                camera.changePlayerView();
+                if(!camera.isInTransition())camera.changePlayerView();
+                break;
+            case KeyEvent.VK_RIGHT:
+                if(!camera.isInTransition())camera.rotateClockWise(camera.getCurrentPosition()+1);
+                break;
+            case KeyEvent.VK_LEFT:
+                if(!camera.isInTransition())camera.rotateCounterClockWise(camera.getCurrentPosition()-1);
                 break;
         }
     }
