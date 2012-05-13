@@ -5,6 +5,7 @@
 package Chess;
 
 import Chess.exception.InvalidSquareException;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,5 +35,14 @@ public class King extends Piece {
         }
 
         return moves;
+    }
+
+    public King(Point position, boolean b, String name) {
+        super(position,b,name);
+    }
+
+    @Override
+    public int calculatePossibleMoves() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
