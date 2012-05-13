@@ -8,13 +8,14 @@ import Jogl.Camera;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 /**
  *
  * @author Lobosque
  */
-public class Listener extends KeyAdapter implements MouseMotionListener{
+public class Listener extends KeyAdapter implements MouseListener {
     private Camera camera;
     
     public Listener(Camera camera){
@@ -49,27 +50,24 @@ public class Listener extends KeyAdapter implements MouseMotionListener{
         }
     }
 
-    public void mouseDragged(MouseEvent e) {
-//        camera.rot += (e.getX() - camera.lastx > 0)? 0.01f : -0.01f;
-//        camera.pitch += (e.getY() - camera.lasty > 0)? 0.01f : -0.01f;
-//
-//	if(camera.rot > 2*Math.PI)
-//		camera.rot -= 2*Math.PI;
-//	if(camera.rot < 0)
-//		camera.rot += 2*Math.PI;
-//
-//
-//	if(camera.pitch > (float)(Math.PI/2))
-//		camera.pitch = (float)(Math.PI/2);
-//	if(camera.pitch < (float)-(Math.PI/2))
-//		camera.pitch = (float)-(Math.PI/2);
-//        camera.lastx = e.getX();
-//        camera.lasty = e.getY();
-//        camera.update();
+    public void mouseClicked(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void mouseMoved(MouseEvent e) {
-        
-
+    public void mousePressed(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public void mouseReleased(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void mouseEntered(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void mouseExited(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

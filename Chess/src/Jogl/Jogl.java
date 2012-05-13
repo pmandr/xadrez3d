@@ -75,7 +75,7 @@ public class Jogl implements GLEventListener {
         GL gl = drawable.getGL();
         glu = new GLU();
         System.err.println("INIT GL IS: " + gl.getClass().getName());
-        drawable.addMouseMotionListener(listener);
+        drawable.addMouseListener(listener);
         // Enable VSync
         gl.setSwapInterval(1);
         gl.glEnable(GL.GL_LIGHTING);
@@ -84,7 +84,7 @@ public class Jogl implements GLEventListener {
         gl.glShadeModel(GL.GL_SMOOTH);
         // Setup the drawing area and shading mode
         gl.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
+        Game.initialize_pieces();
         Game.compileModels(drawable);
         lighting(gl);
 
@@ -124,9 +124,6 @@ public class Jogl implements GLEventListener {
         //limpa o buffer
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
-        /*PointerInfo p = MouseInfo.getPointerInfo();
-        camera.rotate(p.getLocation()); */
-
         width = drawable.getWidth();
         height = drawable.getHeight();
         gl.glViewport(0, 0, width, height);					// Reset The Current Viewport
@@ -139,8 +136,6 @@ public class Jogl implements GLEventListener {
         glu.gluLookAt(camera.getPosX(), camera.getPosY(), camera.getPosZ(),
                 camera.getLookAtPointX(), camera.getLookAtPointY(), camera.getLookAtPointZ(),
                 camera.getUpX(), camera.getUpY(), camera.getUpZ());
-//        glu.gluLookAt(-2, 1,-2, 8,0,8,0,1,0);
-//        glu.gluLookAt(-10, 10,8, 8,0,8,0,1,0);
         
         //define que a matrix é a de modelo
         gl.glMatrixMode(GL.GL_MODELVIEW);					// Select The Modelview Matrix
@@ -152,102 +147,8 @@ public class Jogl implements GLEventListener {
         Game.board.draw(drawable);
         
         //INICIALIZA PEÇAS... TEM Q MUDAR PARA UMA FUNCAO EM BOARD OU GAME??
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 1.0f);
-        Game.models.get("light_rook").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 3.0f);
-        Game.models.get("light_knight").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 5.0f);
-        Game.models.get("light_bishop").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 7.0f);
-        Game.models.get("light_queen").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 9.0f);
-        Game.models.get("light_king").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 11.0f);
-        Game.models.get("light_bishop").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 13.0f);
-        Game.models.get("light_knight").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(1.0f, 1.0f, 15.0f);
-        Game.models.get("light_rook").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 1.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 3.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 5.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 7.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 9.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 11.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 13.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(3.0f, 1.0f, 15.0f);
-        Game.models.get("light_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 1.0f);
-        Game.models.get("dark_rook").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 3.0f);
-        Game.models.get("dark_knight").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 5.0f);
-        Game.models.get("dark_bishop").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 7.0f);
-        Game.models.get("dark_queen").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 9.0f);
-        Game.models.get("dark_king").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 11.0f);
-        Game.models.get("dark_bishop").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 13.0f);
-        Game.models.get("dark_knight").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(15.0f, 1.0f, 15.0f);
-        Game.models.get("dark_rook").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 1.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 3.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 5.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 7.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 9.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 11.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 13.0f);
-        Game.models.get("dark_pawn").draw(drawable);
-        gl.glLoadIdentity();
-        gl.glTranslatef(13.0f, 1.0f, 15.0f);
-        Game.models.get("dark_pawn").draw(drawable);
+        if(Game.isInTransition()) Game.updateTransition(gl,drawable);
+        else Game.loadAlivePieces(gl,drawable);
         
         gl.glLoadIdentity();
         DrawXYZAxis(gl);
