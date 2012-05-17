@@ -13,11 +13,17 @@ import java.util.ArrayList;
  */
 public abstract class Piece {
     protected ArrayList<Point> possible_moves;
-    protected Point current_position;
+    protected Point current_position; //a coordenada Y corresponde aa cooredenada Z no ambiente de jogo
+    protected Point next_transition_position; //a coordenada Y corresponde aa cooredenada Z no ambiente de jogo
+    protected float current_transition_positionX;
+    protected float current_transition_positionY;
+    protected float current_transition_positionZ;
     protected boolean is_white_colored; 
     protected float scale_factor=1.0f;
     protected float height_factor=1.0f;
+    protected float rotate_factor=0.0f;
     protected String name;
+    protected boolean inTransition = false;
 
     public Piece(Point position, boolean color, String name){
         this.current_position = position;
@@ -68,6 +74,52 @@ public abstract class Piece {
     }
     public String getName(){
         return this.name;
+    }
+
+    public float getRotate_factor() {
+        return rotate_factor;
+    }
+    
+    public boolean isInTransition(){
+        return this.inTransition;
+    }
+    public float getCurrentTransitionPositionX(){
+        return current_transition_positionX;
+    }
+    public float getCurrentTransitionPositionY(){
+        return current_transition_positionY;
+    }
+    public float getCurrentTransitionPositionZ(){
+        return current_transition_positionZ;
+    }
+
+    public boolean startTransitionTo(Point next_position){
+//        if(possible_moves.contains(next_position)){
+         if(true){
+            inTransition=true;
+            next_transition_position = next_position;
+            current_transition_positionX = (float) (2*current_position.getX()+1);
+            current_transition_positionY = 0.0f; //significa que esta no chao
+            current_transition_positionZ = (float) (2*current_position.getY()+1);
+            
+            return true;
+        }else return false;
+        
+    }
+    public void updateTransition() {
+        //testa se ja chegou a futura posicao para acabar com a transicao
+//        if(Math.round(current_transition_positionX)==(2*next_transition_position.getX()+1) &&
+        if(current_transition_positionX == (float)(2*next_transition_position.getX()+1) &&
+            current_transition_positionY==0.0f &&
+                current_transition_positionZ == (float)(2*next_transition_position.getY()+1)){
+            inTransition=false;
+            current_position = next_transition_position;
+        }
+        else{//caso ainda nao tenha chegado, atualiza os valores para transicao
+            current_transition_positionX += 0.2f;//adicao gerando erros para futuras comparacoes? precisa de gambiarra
+            //interpolação 3D de 3 pontos: origem, meio-caminho 'voando' e fim
+        }
+        
     }
     
 }
