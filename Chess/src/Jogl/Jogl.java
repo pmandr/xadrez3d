@@ -43,10 +43,10 @@ public class Jogl implements GLEventListener {
         
         
         canvas.addGLEventListener(renderer);
-        Frame frame = new Frame("Simple JOGL Application");
+        Frame frame = new Frame("Xadrez 3D");
         frame.add(canvas);
         frame.setSize(Jogl.width, Jogl.height);
-        final FPSAnimator animator = new FPSAnimator(canvas,60);
+        final FPSAnimator animator = new FPSAnimator(canvas,40);
         frame.addKeyListener(listener);
         frame.addWindowListener(new WindowAdapter() {
 
@@ -78,8 +78,6 @@ public class Jogl implements GLEventListener {
         drawable.addMouseListener(listener);
         // Enable VSync
         gl.setSwapInterval(1);
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_LIGHT0);
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glShadeModel(GL.GL_SMOOTH);
         // Setup the drawing area and shading mode
@@ -91,17 +89,25 @@ public class Jogl implements GLEventListener {
     }
 
     private void lighting(GL gl) {
-        float[] ambient = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] diffuse = new float[]{0.6f, 0.6f, 0.6f, 1.0f};
-        float[] specular = new float[]{0.7f, 0.7f, 0.7f, 1.0f};
-        float[] position = new float[]{8, 8, 50, 0.10f};
-//        float[] position = new float[]{100, 10, 50, 1.0f};
+        float[] white = {1.0f, 1.0f, 1.0f, 1.0f};
+        float[] red = {1.0f, 0.0f, 0.0f, 1.0f};
+        float[] ambient = {0.7f, 0.7f, 0.7f, 1.0f};
+        float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
+        float[] specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+//        float[] position = new float[]{30, 30, 300, 0.10f};
+        float[] position = new float[]{-100, 10, 50, 1.0f};
 
         // Define os parametros da luz de numero 0
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, ambient, 0);
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, diffuse, 0);
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular, 0);
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, position, 0);
+        
+        gl.glEnable(GL.GL_LIGHTING);
+        gl.glEnable(GL.GL_LIGHT0);
+//        gl.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 0.25f);
+//        gl.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.25f);
+//        gl.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.01f);
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -146,9 +152,8 @@ public class Jogl implements GLEventListener {
         gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
         Game.board.draw(drawable);
         
-        //INICIALIZA PEÇAS... TEM Q MUDAR PARA UMA FUNCAO EM BOARD OU GAME??
-        if(Game.isInTransition()) Game.updateTransition(gl,drawable);
-        else Game.loadAlivePieces(gl,drawable);
+        //INICIALIZA PEÇAS...
+        Game.loadAlivePieces(gl,drawable);
         
         gl.glLoadIdentity();
         DrawXYZAxis(gl);

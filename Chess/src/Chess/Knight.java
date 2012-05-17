@@ -46,6 +46,8 @@ public class Knight extends Piece {
 
     Knight(Point position, boolean b, String name) {
         super(position,b,name);
+        if(b) this.rotate_factor = -90;
+        else this.rotate_factor = 90;
     }
 
     @Override

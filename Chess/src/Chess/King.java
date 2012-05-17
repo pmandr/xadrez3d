@@ -39,6 +39,7 @@ public class King extends Piece {
 
     public King(Point position, boolean b, String name) {
         super(position,b,name);
+        this.rotate_factor=90;
     }
 
     @Override

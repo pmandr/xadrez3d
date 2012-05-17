@@ -60,22 +60,22 @@ public class Game {
         for(int i=2;i<6;i++)
             for(int j=0;j<8;j++)
                 alive_pieces[i][j] = null;
-        alive_pieces[6][0] = Piece.factory("light_pawn",new Point(6,0));
-        alive_pieces[6][1] = Piece.factory("light_pawn",new Point(6,1));
-        alive_pieces[6][2] = Piece.factory("light_pawn",new Point(6,2));
-        alive_pieces[6][3] = Piece.factory("light_pawn",new Point(6,3));
-        alive_pieces[6][4] = Piece.factory("light_pawn",new Point(6,4));
-        alive_pieces[6][5] = Piece.factory("light_pawn",new Point(6,5));
-        alive_pieces[6][6] = Piece.factory("light_pawn",new Point(6,6));
-        alive_pieces[6][7] = Piece.factory("light_pawn",new Point(6,7));
-        alive_pieces[7][0] = Piece.factory("light_rook",new Point(7,0));
-        alive_pieces[7][1] = Piece.factory("light_knight",new Point(7,1));
-        alive_pieces[7][2] = Piece.factory("light_bishop",new Point(7,2));
-        alive_pieces[7][3] = Piece.factory("light_queen",new Point(7,3));
-        alive_pieces[7][4] = Piece.factory("light_king",new Point(7,4));
-        alive_pieces[7][5] = Piece.factory("light_bishop",new Point(7,5));
-        alive_pieces[7][6] = Piece.factory("light_knight",new Point(7,6));
-        alive_pieces[7][7] = Piece.factory("light_rook",new Point(7,7));
+        alive_pieces[6][0] = Piece.factory("dark_pawn",new Point(6,0));
+        alive_pieces[6][1] = Piece.factory("dark_pawn",new Point(6,1));
+        alive_pieces[6][2] = Piece.factory("dark_pawn",new Point(6,2));
+        alive_pieces[6][3] = Piece.factory("dark_pawn",new Point(6,3));
+        alive_pieces[6][4] = Piece.factory("dark_pawn",new Point(6,4));
+        alive_pieces[6][5] = Piece.factory("dark_pawn",new Point(6,5));
+        alive_pieces[6][6] = Piece.factory("dark_pawn",new Point(6,6));
+        alive_pieces[6][7] = Piece.factory("dark_pawn",new Point(6,7));
+        alive_pieces[7][0] = Piece.factory("dark_rook",new Point(7,0));
+        alive_pieces[7][1] = Piece.factory("dark_knight",new Point(7,1));
+        alive_pieces[7][2] = Piece.factory("dark_bishop",new Point(7,2));
+        alive_pieces[7][3] = Piece.factory("dark_queen",new Point(7,3));
+        alive_pieces[7][4] = Piece.factory("dark_king",new Point(7,4));
+        alive_pieces[7][5] = Piece.factory("dark_bishop",new Point(7,5));
+        alive_pieces[7][6] = Piece.factory("dark_knight",new Point(7,6));
+        alive_pieces[7][7] = Piece.factory("dark_rook",new Point(7,7));
     }
 
     public static void loadModels() throws IOException {
@@ -130,19 +130,30 @@ public class Game {
                 if(alive_pieces[i][j]!=null){
                     gl.glLoadIdentity();
                     //a localizacao no tabuleiro, em coordenadas de mundo, eh dado por 2*Posicao +1
-                    gl.glTranslatef((float)(2*alive_pieces[i][j].getCurrent_position().getX()+1), (float)(alive_pieces[i][j].getHeight_factor()), (float)(2*alive_pieces[i][j].getCurrent_position().getY()+1));
+                    if(!alive_pieces[i][j].isInTransition()) gl.glTranslatef((float)(2*alive_pieces[i][j].getCurrent_position().getX()+1), (float)(alive_pieces[i][j].getHeight_factor()), (float)(2*alive_pieces[i][j].getCurrent_position().getY()+1));
+                    else{
+                        alive_pieces[i][j].updateTransition();
+                        gl.glTranslatef(alive_pieces[i][j].getCurrentTransitionPositionX(), (float)(alive_pieces[i][j].getHeight_factor())+alive_pieces[i][j].getCurrentTransitionPositionY(), alive_pieces[i][j].getCurrentTransitionPositionZ());
+                    }
+                    
                     float scale = alive_pieces[i][j].getScale_factor();
                     gl.glScalef(scale, scale, scale);
+                    
+                    float rotate = alive_pieces[i][j].getRotate_factor();
+                    if(rotate!=0.0f) gl.glRotatef(rotate, 0.0f, 1.0f, 0.0f);
+                    
                     Game.models.get(alive_pieces[i][j].getName()).draw(drawable);
                 }
             }
     }
-    
-    public static boolean isInTransition(){
-        return isInTransition;
-    }
 
-    public static void updateTransition(GL gl, GLAutoDrawable drawable) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    /*
+     * @method Recupera uma peca do tabuleiro
+     * @param posX e posY devem ser as coordenadas da peça no tabuleiro,
+     *      sendo aceitos apenas valores entre 0 e 7
+     */
+    public static Piece getAlivePiece(int posX, int posY) {
+        if(posX>7 || posX<0 || posY>7 || posY<0 ) return null;
+        else return alive_pieces[posX][posY];
     }
 }

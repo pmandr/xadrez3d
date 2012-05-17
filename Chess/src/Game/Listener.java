@@ -5,6 +5,7 @@
 package Game;
 
 import Jogl.Camera;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -37,6 +38,7 @@ public class Listener extends KeyAdapter implements MouseListener {
             case KeyEvent.VK_Q://faz zoom-out
                 break;
             case KeyEvent.VK_E://faz zoom-out
+                Game.getAlivePiece(1, 2).startTransitionTo(new Point(2,2));
                 break;
             case KeyEvent.VK_X:
                 if(!camera.isInTransition())camera.changePlayerView();
