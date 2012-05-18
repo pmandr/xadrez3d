@@ -4,6 +4,8 @@
  */
 package Chess;
 
+import Chess.exception.InvalidSquareException;
+import Game.Game;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -15,9 +17,22 @@ public abstract class Piece {
     protected ArrayList<Point> possible_moves;
     protected Point current_position; //a coordenada Y corresponde aa cooredenada Z no ambiente de jogo
     protected Point next_transition_position; //a coordenada Y corresponde aa cooredenada Z no ambiente de jogo
+    
+    //pontos da tragetoria
+    protected float beggining_transition_positionX;
+    protected float beggining_transition_positionY;
+    protected float beggining_transition_positionZ;
+    protected float apex_transition_positionX;
+    protected float apex_transition_positionY = 2.0f; //altura que a peca alcanca na transicao de posicoes
+    protected float apex_transition_positionZ;
+    protected float next_transition_positionX;
+    protected float next_transition_positionY;
+    protected float next_transition_positionZ;
     protected float current_transition_positionX;
     protected float current_transition_positionY;
     protected float current_transition_positionZ;
+    protected float animation_timer =0;
+    
     protected boolean is_white_colored; 
     protected float scale_factor=1.0f;
     protected float height_factor=1.0f;
@@ -48,8 +63,75 @@ public abstract class Piece {
     }
     public abstract int calculatePossibleMoves();
     
+    public boolean startTransitionTo(Point next_position) throws Exception{
+//        if(possible_moves.contains(next_position)){
+         if(true){
+            inTransition=true;
+//            Game.setTransition(this.getCurrent_position(), next_position);
+            //gera o ponto de origem da animacao
+            beggining_transition_positionX = (float) (2*current_position.getX()+1);
+            beggining_transition_positionY = 0.0f; //significa que esta no chao
+            beggining_transition_positionZ = (float) (2*current_position.getY()+1);
+            
+            //gera o ponto de destino da animacao
+            next_transition_positionX = (float) (2*next_position.getX()+1);
+            next_transition_positionY = 0.0f; //significa que esta no chao
+            next_transition_positionZ = (float) (2*next_position.getY()+1);
+            
+            //gera o ponto medio (apice) da parabola descrita na animacao
+//            if(beggining_transition_positionX>next_transition_positionX)
+//                apex_transition_positionX = next_transition_positionX+((beggining_transition_positionX-next_transition_positionX)/2);
+//            else  
+//                apex_transition_positionX = beggining_transition_positionX+((next_transition_positionX-beggining_transition_positionX)/2);
+//            if(beggining_transition_positionZ>next_transition_positionZ)
+//                apex_transition_positionZ = next_transition_positionZ+((beggining_transition_positionZ-next_transition_positionZ)/2);
+//            else  
+//                apex_transition_positionZ = beggining_transition_positionZ+((next_transition_positionX-beggining_transition_positionZ)/2);
+            apex_transition_positionX = (beggining_transition_positionX+next_transition_positionX)/2; 
+            apex_transition_positionZ = (beggining_transition_positionZ+next_transition_positionZ)/2; 
+            
+            current_transition_positionX = beggining_transition_positionX;
+            current_transition_positionY = beggining_transition_positionY;
+            current_transition_positionZ = beggining_transition_positionZ;
+            next_transition_position = next_position;
+            animation_timer =0.0f;
+            return true;
+        }else{
+//            Exception InvalidSquareException = new InvalidSquareException();
+//             throw InvalidSquareException;
+             return false;
+         } 
+        
+    }
+    public void updateTransition() {
+        //testa se ja chegou a futura posicao para acabar com a transicao
+//        if(current_transition_positionX == next_transition_positionX &&
+//            current_transition_positionY==0.0f &&
+//                current_transition_positionZ == next_transition_positionZ){
+        if(animation_timer==1.0f){  
+            inTransition=false;
+            current_position = next_transition_position;
+            }
+        else{//caso ainda nao tenha chegado, atualiza os valores para transicao
+            
+            //esta adicao gera erros para futuras comparacoes. os 2 passos abaixo eh uma gambiarra para garantir uma precisao de uma casa decimal
+            animation_timer+=0.01f;
+            animation_timer = Math.round(100*animation_timer);
+            animation_timer= animation_timer/100;
+            
+            current_transition_positionX = calculateXinParabola(animation_timer);
+            current_transition_positionY = calculateYinParabola(animation_timer);
+            current_transition_positionZ = calculateZinParabola(animation_timer);
+//            current_transition_positionX += 0.2f;
+//            current_transition_positionX = Math.round(10*current_transition_positionX);
+//            current_transition_positionX= current_transition_positionX/10;
+            //interpolação 3D de 3 pontos: origem, meio-caminho 'voando' e fim
+        }
+        
+    }
     
-     public void setCurrent_position(Point current_position) {
+    
+      public void setCurrent_position(Point current_position) {
         this.current_position = current_position;
     }
 
@@ -93,33 +175,25 @@ public abstract class Piece {
         return current_transition_positionZ;
     }
 
-    public boolean startTransitionTo(Point next_position){
-//        if(possible_moves.contains(next_position)){
-         if(true){
-            inTransition=true;
-            next_transition_position = next_position;
-            current_transition_positionX = (float) (2*current_position.getX()+1);
-            current_transition_positionY = 0.0f; //significa que esta no chao
-            current_transition_positionZ = (float) (2*current_position.getY()+1);
-            
-            return true;
-        }else return false;
-        
+    //x(t) = x1 - t*(3*x1-4*x2+x3) + 2*t^2*(x1-2*x2+x3), t=0..1
+    private float calculateXinParabola(float animation_timer) {
+        return (beggining_transition_positionX
+                -animation_timer*(3*beggining_transition_positionX -4*apex_transition_positionX +next_transition_positionX)
+                +2*(float)Math.pow(animation_timer, 2)*
+                    (beggining_transition_positionX-2*apex_transition_positionX+next_transition_positionX));
     }
-    public void updateTransition() {
-        //testa se ja chegou a futura posicao para acabar com a transicao
-//        if(Math.round(current_transition_positionX)==(2*next_transition_position.getX()+1) &&
-        if(current_transition_positionX == (float)(2*next_transition_position.getX()+1) &&
-            current_transition_positionY==0.0f &&
-                current_transition_positionZ == (float)(2*next_transition_position.getY()+1)){
-            inTransition=false;
-            current_position = next_transition_position;
-        }
-        else{//caso ainda nao tenha chegado, atualiza os valores para transicao
-            current_transition_positionX += 0.2f;//adicao gerando erros para futuras comparacoes? precisa de gambiarra
-            //interpolação 3D de 3 pontos: origem, meio-caminho 'voando' e fim
-        }
-        
+    //y(t) = y1 - t*(3*y1-4*y2+y3) + 2*t^2*(y1-2*y2+y3)     //t=0..1
+    private float calculateYinParabola(float animation_timer) {
+        return (beggining_transition_positionY
+                -animation_timer*(3*beggining_transition_positionY -4*apex_transition_positionY +next_transition_positionY)
+                +2*(float)Math.pow(animation_timer, 2)*
+                    (beggining_transition_positionY-2*apex_transition_positionY+next_transition_positionY));
     }
-    
+    //z(t) = z1 - t*(3*z1-4*z2+z3) + 2*t^2*(z1-2*z2+z3)     //t=0..1
+    private float calculateZinParabola(float animation_timer) {
+        return (beggining_transition_positionZ
+                -animation_timer*(3*beggining_transition_positionZ -4*apex_transition_positionZ +next_transition_positionZ)
+                +2*(float)Math.pow(animation_timer, 2)*
+                    (beggining_transition_positionZ-2*apex_transition_positionZ+next_transition_positionZ));
+    }
 }
