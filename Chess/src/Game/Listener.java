@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -28,17 +30,46 @@ public class Listener extends KeyAdapter implements MouseListener {
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W://faz zoom-in
+                try {
+                    Game.getAlivePiece(6, 7).startTransitionTo(new Point(3,7));
+                            } catch (Exception ex) {
+                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 break;
             case KeyEvent.VK_S://faz zoom-out
+                try {
+                    Game.getAlivePiece(6, 1).startTransitionTo(new Point(3,6));
+                            } catch (Exception ex) {
+                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 break;
             case KeyEvent.VK_A://faz zoom-out
+                try {
+                    Game.getAlivePiece(2, 1).startTransitionTo(new Point(7,0));
+                            } catch (Exception ex) {
+                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 break;
             case KeyEvent.VK_D://faz zoom-out
+                try {
+                    Game.getAlivePiece(6, 6).startTransitionTo(new Point(2,2));
+                            } catch (Exception ex) {
+                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 break;
             case KeyEvent.VK_Q://faz zoom-out
+                try {
+                    Game.getAlivePiece(6, 5).startTransitionTo(new Point(5,2));
+                            } catch (Exception ex) {
+                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 break;
-            case KeyEvent.VK_E://faz zoom-out
-                Game.getAlivePiece(1, 2).startTransitionTo(new Point(2,2));
+            case KeyEvent.VK_E:
+                try {
+                    Game.getAlivePiece(1, 2).startTransitionTo(new Point(2,7));
+                            } catch (Exception ex) {
+                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 break;
             case KeyEvent.VK_X:
                 if(!camera.isInTransition())camera.changePlayerView();
