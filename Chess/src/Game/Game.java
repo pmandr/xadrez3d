@@ -36,6 +36,7 @@ public class Game {
     public static Board board;
     private static Piece[][] alive_pieces= new Piece[8][8];
     private static boolean isInTransition = false;
+    private static int player = 1;
 
     public static void createBoard() {
         board = new Board(models.get("board"));
@@ -155,5 +156,36 @@ public class Game {
     public static Piece getAlivePiece(int posX, int posY) {
         if(posX>7 || posX<0 || posY>7 || posY<0 ) return null;
         else return alive_pieces[posX][posY];
+    }
+    
+    public static int changePlayer(){
+        if(Game.player==1) Game.player=2;
+        else Game.player=1;
+        return Game.player;
+    }
+
+    public static void selectPosition(GL gl, GLAutoDrawable drawable, double[] linePositionAtYZero) {
+        double proportiolity_constant = 2/2.7;
+        double posX = proportiolity_constant*linePositionAtYZero[0];
+        double posZ = proportiolity_constant*linePositionAtYZero[2];
+        posX = Math.floor(posX);
+        posX -=  posX%2;
+        posZ = Math.floor(posZ);
+        posZ-= posZ%2;
+//        posX -= (posX%2)/2;
+//        posZ = (posZ - (posZ%1))/2;
+//        posZ -= (posZ%2)/2;
+        System.out.println("Posicao selecionada: ("+posX+","+posZ+")");
+        //escolhe a cor do quadrade dependendo do jogador
+        
+        gl.glBegin(GL.GL_POLYGON);
+            if(Game.player == 1){
+                gl.glColor3f(1.0f, 0.0f, 0.0f);
+            }else gl.glColor3f(0.0f, 0.0f, 1.0f);
+            gl.glVertex3f((float)posX+2, 0.01f, (float)(posZ));
+            gl.glVertex3f((float)posX+2, 0.01f, (float)(posZ)+2);
+            gl.glVertex3f((float)posX, 0.01f, (float)(posZ)+2);
+            gl.glVertex3f((float)posX, 0.01f, (float)(posZ));
+        gl.glEnd();
     }
 }

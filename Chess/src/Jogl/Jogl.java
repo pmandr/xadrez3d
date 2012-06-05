@@ -9,10 +9,12 @@ import java.awt.MouseInfo;
 import java.awt.PointerInfo;
 import java.awt.event.*;
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
+import javax.swing.JFrame;
 
 
 /**
@@ -28,7 +30,9 @@ public class Jogl implements GLEventListener {
     private static int height=600;
     private GLU glu;
     private static Jogl renderer = new Jogl();
-    private static Listener listener = new Listener(camera);
+    private static GLCanvas canvas;
+    private static Listener listener =new Listener(camera);
+    private static MouseEvent mouse_event = null;
 
 
     public static void main(String[] args) throws IOException {
@@ -39,14 +43,17 @@ public class Jogl implements GLEventListener {
         GLCapabilities caps = new GLCapabilities();
         caps.setDoubleBuffered(true);
         caps.setHardwareAccelerated(true);
-        GLCanvas canvas = new GLCanvas(caps);
+        canvas = new GLCanvas(caps);
         
         
         canvas.addGLEventListener(renderer);
-        Frame frame = new Frame("Xadrez 3D");
-        frame.add(canvas);
+        JFrame frame = new JFrame("Xadrez 3D");
+        frame.getContentPane().add(canvas);
         frame.setSize(Jogl.width, Jogl.height);
-        final FPSAnimator animator = new FPSAnimator(canvas,40);
+        frame.setLocationRelativeTo(null);
+        final FPSAnimator animator = new FPSAnimator(canvas,60);
+        //listener.setUnprojectionCanvas(canvas);
+        
         frame.addKeyListener(listener);
         frame.addWindowListener(new WindowAdapter() {
 
@@ -68,7 +75,9 @@ public class Jogl implements GLEventListener {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         animator.start();
+        //canvas.requestFocusInWindow();
     }
+    
 
     public void init(GLAutoDrawable drawable) {
 
@@ -129,7 +138,7 @@ public class Jogl implements GLEventListener {
 
         //limpa o buffer
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
+        
         width = drawable.getWidth();
         height = drawable.getHeight();
         gl.glViewport(0, 0, width, height);					// Reset The Current Viewport
@@ -152,11 +161,58 @@ public class Jogl implements GLEventListener {
         gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
         Game.board.draw(drawable);
         
-        //INICIALIZA PEÇAS...
+        //carrega PEÇAS...
         Game.loadAlivePieces(gl,drawable);
+        
+//        if(Game.has)
         
         gl.glLoadIdentity();
         DrawXYZAxis(gl);
+        //GLU UNPROJECT VARIABLES
+        int viewport[] = new int[4];
+        double mvmatrix[] = new double[16];
+        double projmatrix[] = new double[16];
+        int realy = 0;// GL y coord pos
+        double wcoord[] = new double[4];// wx, wy, wz;// returned xyz coords
+         if (mouse_event != null){
+            int x = mouse_event.getX(), y = mouse_event.getY();
+            switch (mouse_event.getButton()) {
+                case MouseEvent.BUTTON1:
+                gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+                gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, mvmatrix, 0);
+                gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projmatrix, 0);
+                /* note viewport[3] is height of window in pixels */
+                realy = viewport[3] - (int) y - 1;
+                System.out.println("Coordinates at cursor are (" + x + ", " + realy);
+                glu.gluUnProject((double) x, (double) realy, 0.0, //
+                    mvmatrix, 0,
+                    projmatrix, 0, 
+                    viewport, 0, 
+                    wcoord, 0);
+                System.out.println("World coords at z=0.0 are ( " //
+                                    + wcoord[0] + ", " + wcoord[1] + ", " + wcoord[2]
+                                    + ")");
+                double[] p1 = {wcoord[0],wcoord[1],wcoord[2]};
+                glu.gluUnProject((double) x, (double) realy, 1.0, //
+                    mvmatrix, 0,
+                    projmatrix, 0,
+                    viewport, 0, 
+                    wcoord, 0);
+                double[] p2 = {wcoord[0],wcoord[1],wcoord[2]};
+                System.out.println("World coords at z=1.0 are (" //
+                                    + wcoord[0] + ", " + wcoord[1] + ", " + wcoord[2]
+                                    + ")");
+                Game.selectPosition(gl,drawable,getLinePositionAtYZero(p1,p2));
+                
+//                mouse_event = null;
+                break;
+                case MouseEvent.BUTTON2:
+                break;
+                default:
+                break;
+      }
+    }
+         
         //força o desenho das primitivas
         gl.glFlush();
     }
@@ -196,5 +252,31 @@ public class Jogl implements GLEventListener {
  
                 
         }
+    public static void setMouseEvent(MouseEvent e){
+        mouse_event = e;
+    }
+    
+
+
+
+    public double[] getLinePositionAtYZero(double[] point1, double[] point2){
+        double t;
+        double[] point = new double[3];
+        point[1] = 0;
+//        point2[0]=-1.0;
+//        point2[1]=-1.0;
+//        point2[2]=-1.0;
+//        point1[0]=6.0;
+//        point1[1]=5.0;
+//        point1[2]=5.0;
+        t = -(point1[1]/point2[1]);
+
+        point[0] = point1[0]+(t*point2[0]);
+        point[2] = point1[2]+(t*point2[2]);
+        
+        System.out.println("board X = "+ point[0]+", board z = "+point[2]);
+        return point;
+    }
+
     
 }

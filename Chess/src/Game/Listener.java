@@ -5,6 +5,7 @@
 package Game;
 
 import Jogl.Camera;
+import Jogl.Jogl;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -13,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.media.opengl.GLCanvas;
 
 /**
  *
@@ -20,8 +22,9 @@ import java.util.logging.Logger;
  */
 public class Listener extends KeyAdapter implements MouseListener {
     private Camera camera;
+    private GLCanvas canvas;
     
-    public Listener(Camera camera){
+    public Listener(Camera camera) {
         this.camera = camera;
     }
     
@@ -84,23 +87,27 @@ public class Listener extends KeyAdapter implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void mousePressed(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Jogl.setMouseEvent(e); 
+        this.canvas.display();
     }
 
     public void mouseReleased(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void mouseEntered(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void mouseExited(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    public void setUnprojectionCanvas(GLCanvas canvas) {
+        this.canvas = canvas;
+    }
 }

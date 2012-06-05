@@ -79,14 +79,6 @@ public abstract class Piece {
             next_transition_positionZ = (float) (2*next_position.getY()+1);
             
             //gera o ponto medio (apice) da parabola descrita na animacao
-//            if(beggining_transition_positionX>next_transition_positionX)
-//                apex_transition_positionX = next_transition_positionX+((beggining_transition_positionX-next_transition_positionX)/2);
-//            else  
-//                apex_transition_positionX = beggining_transition_positionX+((next_transition_positionX-beggining_transition_positionX)/2);
-//            if(beggining_transition_positionZ>next_transition_positionZ)
-//                apex_transition_positionZ = next_transition_positionZ+((beggining_transition_positionZ-next_transition_positionZ)/2);
-//            else  
-//                apex_transition_positionZ = beggining_transition_positionZ+((next_transition_positionX-beggining_transition_positionZ)/2);
             apex_transition_positionX = (beggining_transition_positionX+next_transition_positionX)/2; 
             apex_transition_positionZ = (beggining_transition_positionZ+next_transition_positionZ)/2; 
             
