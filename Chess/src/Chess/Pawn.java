@@ -16,6 +16,7 @@ public class Pawn extends Piece {
 
     Pawn(Point position, boolean b, String name) {
         super(position,b,name);
+//        calculatePossibleMoves();
     }
 
     @Override

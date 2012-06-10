@@ -4,7 +4,7 @@
  */
 package Chess;
 
-import Chess.exception.InvalidSquareException;
+import Game.Game;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,39 +15,53 @@ import java.util.List;
  */
 public class Rook extends Piece {
 
-    protected static List<Square> possibleMoves(Square pos) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int i, j;
-        List<Square> moves = new ArrayList<Square>();
-
-        for (i = 0; i <= 7; i++) {
-            if (i == x) {
-                continue;
-            }
-            try {
-                moves.add(new Square(i, y));
-            } catch (InvalidSquareException ex) {
-            }
-        }
-        for (i = 0; i <= 7; i++) {
-            if (i == y) {
-                continue;
-            }
-            try {
-                moves.add(new Square(x,i));
-            } catch (InvalidSquareException ex) {
-            }
-        }
-        return moves;
-    }
-
     Rook(Point position, boolean b, String name) {
         super(position,b,name);
     }
 
     @Override
     public void calculatePossibleMoves() {
+        possible_moves = new ArrayList<Point>();
+        
+        //linha em frente:
+        int i=1;
+        Piece aux = Game.getAlivePiece((int)current_position.getX()+i,(int)current_position.getY());
+        while(aux == null){
+            possible_moves.add(new Point((int)current_position.getX()+i,(int)current_position.getY()));
+            i++;
+            aux=Game.getAlivePiece((int)current_position.getX()+i,(int)current_position.getY());
+        }
+        if(Game.isEnemyPiece(aux)) possible_moves.add(aux.getCurrent_position());
+        
+        //linha atras:
+        i=-1;
+        aux = Game.getAlivePiece((int)current_position.getX()+i,(int)current_position.getY());
+        while(aux == null){
+            possible_moves.add(new Point((int)current_position.getX()+i,(int)current_position.getY()));
+            i--;
+            aux=Game.getAlivePiece((int)current_position.getX()+i,(int)current_position.getY());
+        }
+        if(Game.isEnemyPiece(aux)) possible_moves.add(aux.getCurrent_position());
+        
+        //linha lateral direita:
+        i=1;
+        aux = Game.getAlivePiece((int)current_position.getX(),(int)current_position.getY()+i);
+        while(aux == null){
+            possible_moves.add(new Point((int)current_position.getX(),(int)current_position.getY()+i));
+            i++;
+            aux=Game.getAlivePiece((int)current_position.getX(),(int)current_position.getY()+i);
+        }
+        if(Game.isEnemyPiece(aux)) possible_moves.add(aux.getCurrent_position());
+        
+        //linha lateral esquerda:
+        i=-1;
+        aux = Game.getAlivePiece((int)current_position.getX(),(int)current_position.getY()+i);
+        while(aux == null){
+            possible_moves.add(new Point((int)current_position.getX(),(int)current_position.getY()+i));
+            i--;
+            aux=Game.getAlivePiece((int)current_position.getX(),(int)current_position.getY()+i);
+        }
+        if(Game.isEnemyPiece(aux)) possible_moves.add(aux.getCurrent_position());
     }
 
    

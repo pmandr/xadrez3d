@@ -4,7 +4,6 @@
  */
 package Chess;
 
-import Chess.exception.InvalidSquareException;
 import Game.Game;
 import Jogl.Camera;
 import java.awt.Point;
@@ -119,9 +118,6 @@ public abstract class Piece {
             current_transition_positionX = calculateXinParabola(animation_timer);
             current_transition_positionY = calculateYinParabola(animation_timer);
             current_transition_positionZ = calculateZinParabola(animation_timer);
-//            current_transition_positionX += 0.2f;
-//            current_transition_positionX = Math.round(10*current_transition_positionX);
-//            current_transition_positionX= current_transition_positionX/10;
             //interpolação 3D de 3 pontos: origem, meio-caminho 'voando' e fim
         }
         

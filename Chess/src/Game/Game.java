@@ -25,6 +25,7 @@ import Jogl.Jogl;
 import Jogl.Model;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.util.*;
 import javax.media.opengl.GL;
 
 /**
@@ -41,6 +42,7 @@ public class Game {
     public static Point current_selected_position_1OF2=null;
     public static Point current_selected_position_2OF2=null;
     private static boolean piece_touched_piece_moved=false;
+    private static boolean paint_possible_moves = true;
     public static void createBoard() {
         board = new Board(models.get("board"));
     }
@@ -181,15 +183,28 @@ public class Game {
     }
 
     public static void drawCurrentPositionAndChildrenPositions(GL gl) {
+        if(Game.player == 1){
+            gl.glColor3f(1.0f, 0.0f, 0.0f);
+        }else gl.glColor3f(0.0f, 0.0f, 1.0f);
         gl.glBegin(GL.GL_POLYGON);
-            if(Game.player == 1){
-                gl.glColor3f(1.0f, 0.0f, 0.0f);
-            }else gl.glColor3f(0.0f, 0.0f, 1.0f);
             gl.glVertex3f((float)current_selected_position_1OF2.getX()*2, 0.01f, (float)current_selected_position_1OF2.getY()*2);
             gl.glVertex3f((float)current_selected_position_1OF2.getX()*2, 0.01f, (float)current_selected_position_1OF2.getY()*2+2);
             gl.glVertex3f((float)current_selected_position_1OF2.getX()*2+2, 0.01f, (float)current_selected_position_1OF2.getY()*2+2);
             gl.glVertex3f((float)current_selected_position_1OF2.getX()*2+2, 0.01f, (float)current_selected_position_1OF2.getY()*2);
         gl.glEnd();
+        
+        if(paint_possible_moves){
+            ArrayList<Point> possible_moves = getAlivePiece((int)current_selected_position_1OF2.getX(),(int)current_selected_position_1OF2.getY()).getPossible_moves();
+            for(int i=0;i<possible_moves.size();i++){
+                Point p = possible_moves.get(i);
+                gl.glBegin(GL.GL_POLYGON);
+                    gl.glVertex3f((float)p.getX()*2, 0.01f, (float)p.getY()*2);
+                    gl.glVertex3f((float)p.getX()*2, 0.01f, (float)p.getY()*2+2);
+                    gl.glVertex3f((float)p.getX()*2+2, 0.01f, (float)p.getY()*2+2);
+                    gl.glVertex3f((float)p.getX()*2+2, 0.01f, (float)p.getY()*2);
+                gl.glEnd();
+            }
+        }
     }
 
     public static void loadBoad(GL gl, GLAutoDrawable drawable) {
@@ -205,10 +220,16 @@ public class Game {
         if(current_selected_position_1OF2 == null){
             //tenta selecionar o primeiro movimento
             if(Game.getAlivePiece(row, col)!= null)
-                if(Game.getAlivePiece(row, col).is_white_colored() && player==1)
+                if(Game.getAlivePiece(row, col).is_white_colored() && player==1){
                     current_selected_position_1OF2 = new Point(row,col);
-                else if(!Game.getAlivePiece(row, col).is_white_colored() && player==2)
-                        current_selected_position_1OF2 = new Point(row,col);
+                    Piece first_piece_selected = Game.getAlivePiece((int)current_selected_position_1OF2.getX(), (int)current_selected_position_1OF2.getY());
+                    first_piece_selected.calculatePossibleMoves();
+                }
+                else if(!Game.getAlivePiece(row, col).is_white_colored() && player==2){
+                    current_selected_position_1OF2 = new Point(row,col);
+                    Piece first_piece_selected = Game.getAlivePiece((int)current_selected_position_1OF2.getX(), (int)current_selected_position_1OF2.getY());
+                    first_piece_selected.calculatePossibleMoves();
+                }
         }else{
             //tenta selecionar o 2o movimento:
             Piece first_piece_selected = Game.getAlivePiece((int)current_selected_position_1OF2.getX(), (int)current_selected_position_1OF2.getY());
@@ -268,14 +289,12 @@ public class Game {
                 .setCurrent_position(Game.current_selected_position_2OF2);
         Game.alive_pieces[(int)Game.current_selected_position_2OF2.getX()][(int)Game.current_selected_position_2OF2.getY()]
                 .calculatePossibleMoves();
+        Game.current_selected_position_1OF2=null;
+        Game.current_selected_position_2OF2=null;
     }
 
     public static void endTransition() {
-        
-        
         Game.isInTransition=false;
-        Game.current_selected_position_1OF2=null;
-        Game.current_selected_position_2OF2=null;
         Game.changePlayer();
         Camera.changePlayerView();
 //        Runtime.getRuntime().gc();
