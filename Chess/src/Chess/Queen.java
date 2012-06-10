@@ -17,8 +17,7 @@ public class Queen extends Piece {
     }
 
     @Override
-    public int calculatePossibleMoves() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void calculatePossibleMoves() {
     }
     
 }

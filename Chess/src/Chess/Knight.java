@@ -51,7 +51,6 @@ public class Knight extends Piece {
     }
 
     @Override
-    public int calculatePossibleMoves() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void calculatePossibleMoves() {
     }
 }

@@ -21,12 +21,7 @@ import javax.media.opengl.GLCanvas;
  * @author Lobosque
  */
 public class Listener extends KeyAdapter implements MouseListener {
-    private Camera camera;
     private GLCanvas canvas;
-    
-    public Listener(Camera camera) {
-        this.camera = camera;
-    }
     
     @Override
     public void keyPressed(KeyEvent e) {
@@ -75,13 +70,13 @@ public class Listener extends KeyAdapter implements MouseListener {
                         }
                 break;
             case KeyEvent.VK_X:
-                if(!camera.isInTransition())camera.changePlayerView();
+                if(!Camera.isInTransition())Camera.changePlayerView();
                 break;
             case KeyEvent.VK_RIGHT:
-                if(!camera.isInTransition())camera.rotateClockWise(camera.getCurrentPosition()+1);
+                if(!Camera.isInTransition())Camera.rotateClockWise(Camera.getCurrentPosition()+1);
                 break;
             case KeyEvent.VK_LEFT:
-                if(!camera.isInTransition())camera.rotateCounterClockWise(camera.getCurrentPosition()-1);
+                if(!Camera.isInTransition())Camera.rotateCounterClockWise(Camera.getCurrentPosition()-1);
                 break;
         }
     }
@@ -91,8 +86,10 @@ public class Listener extends KeyAdapter implements MouseListener {
     }
 
     public void mousePressed(MouseEvent e) {
-        Jogl.setMouseEvent(e); 
-        this.canvas.display();
+        if(!Game.isInTransition){
+            Jogl.setMouseEvent(e);
+            this.canvas.display();
+        } 
     }
 
     public void mouseReleased(MouseEvent e) {
