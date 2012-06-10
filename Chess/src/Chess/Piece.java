@@ -6,6 +6,7 @@ package Chess;
 
 import Chess.exception.InvalidSquareException;
 import Game.Game;
+import Jogl.Camera;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  * @author Lobosque
  */
 public abstract class Piece {
-    protected ArrayList<Point> possible_moves;
+    protected ArrayList<Point> possible_moves = new ArrayList<Point>();
     protected Point current_position; //a coordenada Y corresponde aa cooredenada Z no ambiente de jogo
     protected Point next_transition_position; //a coordenada Y corresponde aa cooredenada Z no ambiente de jogo
     
@@ -39,11 +40,13 @@ public abstract class Piece {
     protected float rotate_factor=0.0f;
     protected String name;
     protected boolean inTransition = false;
+    private boolean isDying = false;
 
     public Piece(Point position, boolean color, String name){
         this.current_position = position;
         this.is_white_colored=color;
         this.name = name;
+        
     }
     
     public static Piece factory(String piece_type, Point position){
@@ -58,14 +61,13 @@ public abstract class Piece {
         else if(piece_type.equals("dark_bishop")) return new Bishop(position,false,"dark_bishop");
         else if(piece_type.equals("dark_queen")) return new Queen(position,false,"dark_queen");
         else if(piece_type.equals("dark_king")) return new King(position,false,"dark_king");
-        else// if(piece_type.equals("dark_pawn"))
-            return new Pawn(position,false,"dark_pawn");
+        else if(piece_type.equals("dark_pawn")) return new Pawn(position,false,"dark_pawn");
+        else return new Pawn(position,false,"out of borders"); //for calculating the possible moves
     }
-    public abstract int calculatePossibleMoves();
+    public abstract void calculatePossibleMoves();
     
     public boolean startTransitionTo(Point next_position) throws Exception{
 //        if(possible_moves.contains(next_position)){
-         if(true){
             inTransition=true;
 //            Game.setTransition(this.getCurrent_position(), next_position);
             //gera o ponto de origem da animacao
@@ -88,11 +90,11 @@ public abstract class Piece {
             next_transition_position = next_position;
             animation_timer =0.0f;
             return true;
-        }else{
+//        }else{
 //            Exception InvalidSquareException = new InvalidSquareException();
 //             throw InvalidSquareException;
-             return false;
-         } 
+//             return false;
+//         } 
         
     }
     public void updateTransition() {
@@ -102,14 +104,17 @@ public abstract class Piece {
 //                current_transition_positionZ == next_transition_positionZ){
         if(animation_timer==1.0f){  
             inTransition=false;
+            isDying=false;
             current_position = next_transition_position;
+            Game.endTransition();
+            
             }
         else{//caso ainda nao tenha chegado, atualiza os valores para transicao
-            
+            if(isDying) height_factor -= animation_timer/50;
             //esta adicao gera erros para futuras comparacoes. os 2 passos abaixo eh uma gambiarra para garantir uma precisao de uma casa decimal
             animation_timer+=0.01f;
             animation_timer = Math.round(100*animation_timer);
-            animation_timer= animation_timer/100;
+            animation_timer = animation_timer/100;
             
             current_transition_positionX = calculateXinParabola(animation_timer);
             current_transition_positionY = calculateYinParabola(animation_timer);
@@ -187,5 +192,11 @@ public abstract class Piece {
                 -animation_timer*(3*beggining_transition_positionZ -4*apex_transition_positionZ +next_transition_positionZ)
                 +2*(float)Math.pow(animation_timer, 2)*
                     (beggining_transition_positionZ-2*apex_transition_positionZ+next_transition_positionZ));
+    }
+
+    public void startDying() {
+        isDying = true;
+        inTransition=true;
+        next_transition_position=current_position;
     }
 }

@@ -6,6 +6,7 @@ package Game;
 
 import Chess.Board;
 import Chess.Piece;
+import Jogl.Camera;
 import com.sun.opengl.util.Animator;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -34,10 +35,12 @@ public class Game {
 
     public static Map<String, Model> models;
     public static Board board;
-    private static Piece[][] alive_pieces= new Piece[8][8];
-    private static boolean isInTransition = false;
+    public static Piece[][] alive_pieces= new Piece[8][8];
+    public static boolean isInTransition = false;
     private static int player = 1;
-
+    public static Point current_selected_position_1OF2=null;
+    public static Point current_selected_position_2OF2=null;
+    private static boolean piece_touched_piece_moved=false;
     public static void createBoard() {
         board = new Board(models.get("board"));
     }
@@ -77,8 +80,14 @@ public class Game {
         alive_pieces[7][5] = Piece.factory("dark_bishop",new Point(7,5));
         alive_pieces[7][6] = Piece.factory("dark_knight",new Point(7,6));
         alive_pieces[7][7] = Piece.factory("dark_rook",new Point(7,7));
+//        for(int i=0;i<8;i++)
+//            for(int j=0; j<8;j++)
+//                if(alive_pieces[i][j]!=null) 
+//                    alive_pieces[i][j].calculatePossibleMoves();
     }
-
+    public static void updateTransition(){
+        
+    } 
     public static void loadModels() throws IOException {
         models = new HashMap<String, Model>();
 
@@ -131,10 +140,17 @@ public class Game {
                 if(alive_pieces[i][j]!=null){
                     gl.glLoadIdentity();
                     //a localizacao no tabuleiro, em coordenadas de mundo, eh dado por 2*Posicao +1
-                    if(!alive_pieces[i][j].isInTransition()) gl.glTranslatef((float)(2*alive_pieces[i][j].getCurrent_position().getX()+1), (float)(alive_pieces[i][j].getHeight_factor()), (float)(2*alive_pieces[i][j].getCurrent_position().getY()+1));
-                    else{
+                    if(!alive_pieces[i][j].isInTransition()){ 
+                        gl.glTranslatef((float)(2*alive_pieces[i][j].getCurrent_position().getX()+1), (float)(alive_pieces[i][j].getHeight_factor()), (float)(2*alive_pieces[i][j].getCurrent_position().getY()+1));
+                    }else{
                         alive_pieces[i][j].updateTransition();
-                        gl.glTranslatef(alive_pieces[i][j].getCurrentTransitionPositionX(), (float)(alive_pieces[i][j].getHeight_factor())+alive_pieces[i][j].getCurrentTransitionPositionY(), alive_pieces[i][j].getCurrentTransitionPositionZ());
+                        try{
+                            gl.glTranslatef(alive_pieces[i][j].getCurrentTransitionPositionX(), 
+                                (float)(alive_pieces[i][j].getHeight_factor())+alive_pieces[i][j].getCurrentTransitionPositionY(),
+                                alive_pieces[i][j].getCurrentTransitionPositionZ());
+                        }catch(NullPointerException ex){
+                            System.out.println("Erro de leitura: Null Pointer exception");
+                        }
                     }
                     
                     float scale = alive_pieces[i][j].getScale_factor();
@@ -154,7 +170,7 @@ public class Game {
      *      sendo aceitos apenas valores entre 0 e 7
      */
     public static Piece getAlivePiece(int posX, int posY) {
-        if(posX>7 || posX<0 || posY>7 || posY<0 ) return null;
+        if(posX>7 || posX<0 || posY>7 || posY<0 ) return Piece.factory("out of borders", new Point(-1,-1));
         else return alive_pieces[posX][posY];
     }
     
@@ -164,28 +180,112 @@ public class Game {
         return Game.player;
     }
 
-    public static void selectPosition(GL gl, GLAutoDrawable drawable, double[] linePositionAtYZero) {
-        double proportiolity_constant = 2/2.7;
-        double posX = proportiolity_constant*linePositionAtYZero[0];
-        double posZ = proportiolity_constant*linePositionAtYZero[2];
-        posX = Math.floor(posX);
-        posX -=  posX%2;
-        posZ = Math.floor(posZ);
-        posZ-= posZ%2;
-//        posX -= (posX%2)/2;
-//        posZ = (posZ - (posZ%1))/2;
-//        posZ -= (posZ%2)/2;
-        System.out.println("Posicao selecionada: ("+posX+","+posZ+")");
-        //escolhe a cor do quadrade dependendo do jogador
-        
+    public static void drawCurrentPositionAndChildrenPositions(GL gl) {
         gl.glBegin(GL.GL_POLYGON);
             if(Game.player == 1){
                 gl.glColor3f(1.0f, 0.0f, 0.0f);
             }else gl.glColor3f(0.0f, 0.0f, 1.0f);
-            gl.glVertex3f((float)posX+2, 0.01f, (float)(posZ));
-            gl.glVertex3f((float)posX+2, 0.01f, (float)(posZ)+2);
-            gl.glVertex3f((float)posX, 0.01f, (float)(posZ)+2);
-            gl.glVertex3f((float)posX, 0.01f, (float)(posZ));
+            gl.glVertex3f((float)current_selected_position_1OF2.getX()*2, 0.01f, (float)current_selected_position_1OF2.getY()*2);
+            gl.glVertex3f((float)current_selected_position_1OF2.getX()*2, 0.01f, (float)current_selected_position_1OF2.getY()*2+2);
+            gl.glVertex3f((float)current_selected_position_1OF2.getX()*2+2, 0.01f, (float)current_selected_position_1OF2.getY()*2+2);
+            gl.glVertex3f((float)current_selected_position_1OF2.getX()*2+2, 0.01f, (float)current_selected_position_1OF2.getY()*2);
         gl.glEnd();
+    }
+
+    public static void loadBoad(GL gl, GLAutoDrawable drawable) {
+        float proportionality = (float) (21.2/19.5);//proporcao entre tamanho de todo tabuleiro e soh a a area das pecas dentro dele
+        gl.glTranslatef(-(16*proportionality-16.0f)/2, 0.0f, -(16*proportionality-16.0f)/2);//coloca as bordas para fora do plano cartesiano positivo
+        gl.glScalef((8*proportionality),0.10f,(8*proportionality));//o tamanho do tabuleiro(parte dos quadrados) fica 16x16
+        gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
+        board.draw(drawable);
+    }
+
+    //controle de selecao de movimento pelo jogador
+    public static void setSelectedMove(int row, int col) {
+        if(current_selected_position_1OF2 == null){
+            //tenta selecionar o primeiro movimento
+            if(Game.getAlivePiece(row, col)!= null)
+                if(Game.getAlivePiece(row, col).is_white_colored() && player==1)
+                    current_selected_position_1OF2 = new Point(row,col);
+                else if(!Game.getAlivePiece(row, col).is_white_colored() && player==2)
+                        current_selected_position_1OF2 = new Point(row,col);
+        }else{
+            //tenta selecionar o 2o movimento:
+            Piece first_piece_selected = Game.getAlivePiece((int)current_selected_position_1OF2.getX(), (int)current_selected_position_1OF2.getY());
+            first_piece_selected.calculatePossibleMoves();
+        
+            //tenta selecionar outra de suas proprias pecas
+            if(Game.getAlivePiece(row, col)!= null){
+                if(!Game.piece_touched_piece_moved){
+                    if(Game.getAlivePiece(row, col).is_white_colored() && player==1)
+                        current_selected_position_1OF2 = new Point(row,col);
+                        else if(!Game.getAlivePiece(row, col).is_white_colored() && player==2)
+                            current_selected_position_1OF2 = new Point(row,col);
+                    }
+                 //tenta comer uma peca inimiga
+                if((Game.isEnemyPiece(Game.getAlivePiece(row, col)) &&
+                        first_piece_selected.getPossible_moves().contains(new Point(row,col)))){
+                    current_selected_position_2OF2 = new Point(row,col);
+                    makeMove("eat_enemy");
+                    }
+            }else{
+                //tenta movimentar para espaco vazio
+                if(first_piece_selected.getPossible_moves().contains(new Point(row,col))){
+                    current_selected_position_2OF2 = new Point(row,col);
+                    makeMove("simple_move");
+                    }
+                }
+             }
+    }
+    public static Point getBoardPosition(Piece piece){
+        for(int i=0;i<8;i++)
+            for(int j=0;j<8;j++)
+                if(alive_pieces[i][j]==piece)
+                    return new Point(i,j);
+        return null;
+    }
+    
+    //essa funcao deve ser chamada somente quando uma jogada valida é completa
+    private static void makeMove(String move) {
+        try {
+
+            Game.alive_pieces[(int)current_selected_position_1OF2.getX()][(int)current_selected_position_1OF2.getY()]
+                    .startTransitionTo(current_selected_position_2OF2);
+            if(move.equalsIgnoreCase("eat_enemy")){
+                Game.alive_pieces[(int)current_selected_position_2OF2.getX()][(int)current_selected_position_2OF2.getY()]
+                        .startDying();
+            }
+
+        } catch (Exception ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Game.isInTransition = true;
+        Game.alive_pieces[(int)Game.current_selected_position_2OF2.getX()][(int)Game.current_selected_position_2OF2.getY()]
+                = Game.alive_pieces[(int)Game.current_selected_position_1OF2.getX()][(int)Game.current_selected_position_1OF2.getY()];
+        Game.alive_pieces[(int)Game.current_selected_position_1OF2.getX()][(int)Game.current_selected_position_1OF2.getY()]
+                = null;
+        Game.alive_pieces[(int)Game.current_selected_position_2OF2.getX()][(int)Game.current_selected_position_2OF2.getY()]
+                .setCurrent_position(Game.current_selected_position_2OF2);
+        Game.alive_pieces[(int)Game.current_selected_position_2OF2.getX()][(int)Game.current_selected_position_2OF2.getY()]
+                .calculatePossibleMoves();
+    }
+
+    public static void endTransition() {
+        
+        
+        Game.isInTransition=false;
+        Game.current_selected_position_1OF2=null;
+        Game.current_selected_position_2OF2=null;
+        Game.changePlayer();
+        Camera.changePlayerView();
+//        Runtime.getRuntime().gc();
+    }
+
+    public static boolean isEnemyPiece(Piece piece) {
+        if(piece==null) return false;
+        if(piece.getName().equalsIgnoreCase("out of borders")) return false;
+        if(player==1 && !piece.is_white_colored())return true;
+        if(player==2 && piece.is_white_colored())return true;
+        return false;    
     }
 }

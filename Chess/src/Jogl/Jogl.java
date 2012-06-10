@@ -6,6 +6,7 @@ import com.sun.opengl.util.FPSAnimator;
 import com.sun.opengl.util.GLUT;
 import java.awt.Frame;
 import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.event.*;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class Jogl implements GLEventListener {
     private GLU glu;
     private static Jogl renderer = new Jogl();
     private static GLCanvas canvas;
-    private static Listener listener =new Listener(camera);
+    private static Listener listener =new Listener();
     private static MouseEvent mouse_event = null;
 
 
@@ -97,28 +98,6 @@ public class Jogl implements GLEventListener {
 
     }
 
-    private void lighting(GL gl) {
-        float[] white = {1.0f, 1.0f, 1.0f, 1.0f};
-        float[] red = {1.0f, 0.0f, 0.0f, 1.0f};
-        float[] ambient = {0.7f, 0.7f, 0.7f, 1.0f};
-        float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
-        float[] specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
-//        float[] position = new float[]{30, 30, 300, 0.10f};
-        float[] position = new float[]{-100, 10, 50, 1.0f};
-
-        // Define os parametros da luz de numero 0
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, ambient, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, diffuse, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, position, 0);
-        
-        gl.glEnable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_LIGHT0);
-//        gl.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 0.25f);
-//        gl.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.25f);
-//        gl.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.01f);
-    }
-
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL gl = drawable.getGL();
         if (height <= 0) { // avoid a divide by zero error!
@@ -155,63 +134,15 @@ public class Jogl implements GLEventListener {
         //define que a matrix é a de modelo
         gl.glMatrixMode(GL.GL_MODELVIEW);					// Select The Modelview Matrix
         gl.glLoadIdentity();
-        float proportionality = (float) (21.2/19.5);//proporcao entre tamanho de todo tabuleiro e soh a a area das pecas dentro dele
-        gl.glTranslatef(-(16*proportionality-16.0f)/2, 0.0f, -(16*proportionality-16.0f)/2);//coloca as bordas para fora do plano cartesiano positivo
-        gl.glScalef((8*proportionality),0.10f,(8*proportionality));//o tamanho do tabuleiro(parte dos quadrados) fica 16x16
-        gl.glTranslatef(1.0f, 0.0f, 1.0f); //1=a metade tamanho do tabuleiro normalizado antes da escala
-        Game.board.draw(drawable);
         
+        Game.loadBoad(gl,drawable);
         //carrega PEÇAS...
         Game.loadAlivePieces(gl,drawable);
         
-//        if(Game.has)
-        
         gl.glLoadIdentity();
+        if (mouse_event != null) processClick(gl,glu);
+        if(Game.current_selected_position_1OF2 != null) Game.drawCurrentPositionAndChildrenPositions(gl);
         DrawXYZAxis(gl);
-        //GLU UNPROJECT VARIABLES
-        int viewport[] = new int[4];
-        double mvmatrix[] = new double[16];
-        double projmatrix[] = new double[16];
-        int realy = 0;// GL y coord pos
-        double wcoord[] = new double[4];// wx, wy, wz;// returned xyz coords
-         if (mouse_event != null){
-            int x = mouse_event.getX(), y = mouse_event.getY();
-            switch (mouse_event.getButton()) {
-                case MouseEvent.BUTTON1:
-                gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
-                gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, mvmatrix, 0);
-                gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projmatrix, 0);
-                /* note viewport[3] is height of window in pixels */
-                realy = viewport[3] - (int) y - 1;
-                System.out.println("Coordinates at cursor are (" + x + ", " + realy);
-                glu.gluUnProject((double) x, (double) realy, 0.0, //
-                    mvmatrix, 0,
-                    projmatrix, 0, 
-                    viewport, 0, 
-                    wcoord, 0);
-                System.out.println("World coords at z=0.0 are ( " //
-                                    + wcoord[0] + ", " + wcoord[1] + ", " + wcoord[2]
-                                    + ")");
-                double[] p1 = {wcoord[0],wcoord[1],wcoord[2]};
-                glu.gluUnProject((double) x, (double) realy, 1.0, //
-                    mvmatrix, 0,
-                    projmatrix, 0,
-                    viewport, 0, 
-                    wcoord, 0);
-                double[] p2 = {wcoord[0],wcoord[1],wcoord[2]};
-                System.out.println("World coords at z=1.0 are (" //
-                                    + wcoord[0] + ", " + wcoord[1] + ", " + wcoord[2]
-                                    + ")");
-                Game.selectPosition(gl,drawable,getLinePositionAtYZero(p1,p2));
-                
-//                mouse_event = null;
-                break;
-                case MouseEvent.BUTTON2:
-                break;
-                default:
-                break;
-      }
-    }
          
         //força o desenho das primitivas
         gl.glFlush();
@@ -220,6 +151,28 @@ public class Jogl implements GLEventListener {
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
     
+    private void lighting(GL gl) {
+        float[] white = {1.0f, 1.0f, 1.0f, 1.0f};
+        float[] red = {1.0f, 0.0f, 0.0f, 1.0f};
+        float[] ambient = {0.7f, 0.7f, 0.7f, 1.0f};
+        float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
+        float[] specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+//        float[] position = new float[]{30, 30, 300, 0.10f};
+        float[] position = new float[]{-100, 10, 50, 1.0f};
+
+        // Define os parametros da luz de numero 0
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, ambient, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, diffuse, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, position, 0);
+        
+        gl.glEnable(GL.GL_LIGHTING);
+        gl.glEnable(GL.GL_LIGHT0);
+//        gl.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 0.25f);
+//        gl.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.25f);
+//        gl.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.01f);
+    }
+
     public void DrawXYZAxis(GL gl){
            GLUT glut = new GLUT();
                 //X Axis
@@ -249,34 +202,75 @@ public class Jogl implements GLEventListener {
                         gl.glVertex3f(0,0,0);
                         gl.glVertex3f(0,0,20);
             gl.glEnd();
- 
-                
         }
     public static void setMouseEvent(MouseEvent e){
         mouse_event = e;
     }
-    
 
+    private void processClick(GL gl, GLU glu) {
+        //GLU UNPROJECT VARIABLES
+        int viewport[] = new int[4];
+        double mvmatrix[] = new double[16];
+        double projmatrix[] = new double[16];
+        int realy = 0;// GL y coord pos
+        double wcoord[] = new double[4];// wx, wy, wz;// returned xyz coords
+         
+        int x = mouse_event.getX(), y = mouse_event.getY();
+        switch (mouse_event.getButton()) {
+            case MouseEvent.BUTTON1:
+            gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+            gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, mvmatrix, 0);
+            gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projmatrix, 0);
+            /* note viewport[3] is height of window in pixels */
+            realy = viewport[3] - (int) y - 1;
+//                System.out.println("Coordinates at cursor are (" + x + ", " + realy);
+            glu.gluUnProject((double) x, (double) realy, 0.0, //
+                mvmatrix, 0,
+                projmatrix, 0, 
+                viewport, 0, 
+                wcoord, 0);
+//            System.out.println("World coords at z=0.0 are ( " //
+//                                + wcoord[0] + ", " + wcoord[1] + ", " + wcoord[2]
+//                                + ")");
+            double[] p1 = {wcoord[0],wcoord[1],wcoord[2]};
+            glu.gluUnProject((double) x, (double) realy, 1.0, //
+                mvmatrix, 0,
+                projmatrix, 0,
+                viewport, 0, 
+                wcoord, 0);
+            double[] p2 = {wcoord[0],wcoord[1],wcoord[2]};
+//            System.out.println("World coords at z=1.0 are (" //
+//                                + wcoord[0] + ", " + wcoord[1] + ", " + wcoord[2]
+//                                + ")");
 
-
-    public double[] getLinePositionAtYZero(double[] point1, double[] point2){
-        double t;
-        double[] point = new double[3];
-        point[1] = 0;
-//        point2[0]=-1.0;
-//        point2[1]=-1.0;
-//        point2[2]=-1.0;
-//        point1[0]=6.0;
-//        point1[1]=5.0;
-//        point1[2]=5.0;
-        t = -(point1[1]/point2[1]);
-
-        point[0] = point1[0]+(t*point2[0]);
-        point[2] = point1[2]+(t*point2[2]);
-        
-        System.out.println("board X = "+ point[0]+", board z = "+point[2]);
-        return point;
+            double[] point = new double[3];
+            double[] VET_DIRETOR = {(p1[0]-p2[0]),(p1[1]-p2[1]),(p1[2]-p2[2])};
+            double t = (-p1[1])/VET_DIRETOR[1];
+        //feita com equacoes parametricas da reta:http://www.mat.puc-rio.br/cursos/MAT1200/roteiros//aula2091.pdf
+            point[0] = p1[0]+(t*VET_DIRETOR[0]);
+            point[1] = 0;
+            point[2] = p1[2]+(t*VET_DIRETOR[2]);
+//            System.out.println("board X = "+ point[0]+", board z = "+point[2]);
+            
+            //converte para as coordenadas de tabuleiro
+            point[0] = Math.floor(point[0]);
+            point[0] -=  point[0]%2;
+            point[0] = point[0]/2;
+            point[2] = Math.floor(point[2]);
+            point[2]-= point[2]%2;
+            point[2] = point[2]/2;
+            
+//            System.out.println("Posicao selecionada: ("+ point[0]+","+ point[2]+")");
+            
+            if(point[0]>=0 &&  point[0]<=7 && point[2]>=0 &&  point[2]<=7)
+                Game.setSelectedMove((int)point[0], (int)point[2]);
+            mouse_event = null;
+            break;
+            case MouseEvent.BUTTON2:
+            break;
+            default:
+            break;
+      }
     }
-
     
 }
