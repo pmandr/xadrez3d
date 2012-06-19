@@ -183,9 +183,15 @@ public class Game {
     }
 
     public static void drawCurrentPositionAndChildrenPositions(GL gl) {
+        float[] rgba;
         if(Game.player == 1){
-            gl.glColor3f(1.0f, 0.0f, 0.0f);
-        }else gl.glColor3f(0.0f, 0.0f, 1.0f);
+        rgba = new float[] {1.0f, 0.0f, 0.0f};
+        gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, rgba, 0);
+        }
+        else {
+        rgba = new float[] {0.0f, 0.0f, 1.0f};
+        gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, rgba, 0);
+        }
         gl.glBegin(GL.GL_POLYGON);
             gl.glVertex3f((float)current_selected_position_1OF2.getX()*2, 0.01f, (float)current_selected_position_1OF2.getY()*2);
             gl.glVertex3f((float)current_selected_position_1OF2.getX()*2, 0.01f, (float)current_selected_position_1OF2.getY()*2+2);
