@@ -17,6 +17,7 @@ public class Rook extends Piece {
 
     Rook(Point position, boolean b, String name) {
         super(position,b,name);
+        
     }
 
     @Override

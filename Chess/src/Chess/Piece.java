@@ -45,7 +45,7 @@ public abstract class Piece {
         this.current_position = position;
         this.is_white_colored=color;
         this.name = name;
-        
+//        this.calculatePossibleMoves();
     }
     
     public static Piece factory(String piece_type, Point position){

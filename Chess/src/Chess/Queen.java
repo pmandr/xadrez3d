@@ -16,6 +16,8 @@ public class Queen extends Piece {
 
     Queen(Point position, boolean b, String name) {
         super(position,b,name);
+        this.height_factor = 1.2f;
+        this.scale_factor = 1.2f;
     }
 
     @Override

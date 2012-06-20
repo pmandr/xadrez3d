@@ -21,6 +21,8 @@ public class Knight extends Piece {
         super(position,b,name);
         if(b) this.rotate_factor = -90;
         else this.rotate_factor = 90;
+        this.height_factor = 1.1f;
+        this.scale_factor = 1.1f;
     }
 
     @Override
