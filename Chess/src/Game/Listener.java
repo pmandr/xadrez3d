@@ -27,51 +27,6 @@ public class Listener extends KeyAdapter implements MouseListener {
     public void keyPressed(KeyEvent e) {
 
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_W://faz zoom-in
-                try {
-                    Game.getAlivePiece(6, 7).startTransitionTo(new Point(3,7));
-                            } catch (Exception ex) {
-                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                break;
-            case KeyEvent.VK_S://faz zoom-out
-                try {
-                    Game.getAlivePiece(6, 1).startTransitionTo(new Point(3,6));
-                            } catch (Exception ex) {
-                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                break;
-            case KeyEvent.VK_A://faz zoom-out
-                try {
-                    Game.getAlivePiece(2, 1).startTransitionTo(new Point(7,0));
-                            } catch (Exception ex) {
-                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                break;
-            case KeyEvent.VK_D://faz zoom-out
-                try {
-                    Game.getAlivePiece(6, 6).startTransitionTo(new Point(2,2));
-                            } catch (Exception ex) {
-                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                break;
-            case KeyEvent.VK_Q://faz zoom-out
-                try {
-                    Game.getAlivePiece(6, 5).startTransitionTo(new Point(5,2));
-                            } catch (Exception ex) {
-                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                break;
-            case KeyEvent.VK_E:
-                try {
-                    Game.getAlivePiece(1, 2).startTransitionTo(new Point(2,7));
-                            } catch (Exception ex) {
-                                Logger.getLogger(Listener.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                break;
-            case KeyEvent.VK_X:
-                if(!Camera.isInTransition())Camera.changePlayerView();
-                break;
             case KeyEvent.VK_RIGHT:
                 if(!Camera.isInTransition())Camera.rotateClockWise(Camera.getCurrentPosition()+1);
                 break;
@@ -86,10 +41,22 @@ public class Listener extends KeyAdapter implements MouseListener {
     }
 
     public void mousePressed(MouseEvent e) {
-        if(!Game.isInTransition){
-            Jogl.setMouseEvent(e);
-            this.canvas.display();
-        } 
+        switch(e.getButton()){
+            case MouseEvent.BUTTON1:
+                if(!Game.isInTransition){
+                    Jogl.setMouseEvent(e);
+                    this.canvas.display();
+                } 
+                break;
+            case MouseEvent.BUTTON2:
+                if(!Camera.isInTransition())Camera.rotateCounterClockWise(Camera.getCurrentPosition()-1);
+                break;
+            case MouseEvent.BUTTON3:
+                if(!Camera.isInTransition())Camera.rotateClockWise(Camera.getCurrentPosition()+1);
+                break;
+            
+        }
+        
     }
 
     public void mouseReleased(MouseEvent e) {

@@ -4,12 +4,17 @@ import Game.*;
 import com.sun.opengl.util.Animator;
 import com.sun.opengl.util.FPSAnimator;
 import com.sun.opengl.util.GLUT;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureCoords;
+import com.sun.opengl.util.texture.TextureData;
+import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Frame;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.event.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.IntBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,6 +96,7 @@ public class Jogl implements GLEventListener {
         gl.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         Game.initialize_pieces();
         Game.compileModels(drawable);
+//        initbg();
         lighting(gl);
 
     }
@@ -122,7 +128,7 @@ public class Jogl implements GLEventListener {
         gl.glMatrixMode(GL.GL_PROJECTION);					// Select The Projection Matrix
         gl.glLoadIdentity();							// Reset The Projection Matrix
         glu.gluPerspective(45.0, (float) width / (float) height, 1, 50);
-
+//        drawbg(gl, glu);
         if (camera.isInTransition()) {
             camera.updateTransition();
         }
@@ -284,4 +290,115 @@ public class Jogl implements GLEventListener {
                 break;
         }
     }
+//    private Texture bgTexture;
+//    private TextureCoords bgTexCoords;
+//    public void initbg() {
+//        try {
+//            InputStream stream = getClass().getResourceAsStream("/models/bg.jpg");
+//            TextureData data = TextureIO.newTextureData(stream, false, "jpg");
+//            bgTexture = TextureIO.newTexture(data);
+//        } catch (IOException exc) {
+//            System.out.println("Falha ao carregar a textura de mw.jpg");
+//            System.exit(1);
+//        }
+//         bgTexCoords = bgTexture.getImageTexCoords();
+//    }
+//
+//    public void drawbg(GL gl, GLU glu) {
+//
+//    gl.glPushMatrix();
+//
+//    gl.glLoadIdentity();
+//
+//       glu.gluLookAt(0, 0, 0, 3/100, 3/100, 3/100, 0, 1, 0);
+//
+//    gl.glPushAttrib(GL.GL_ENABLE_BIT);
+//    gl.glEnable(GL.GL_TEXTURE_2D);
+//    gl.glDisable(GL.GL_DEPTH_TEST);
+//    gl.glDisable(GL.GL_LIGHTING);
+//    gl.glDisable(GL.GL_BLEND);
+//
+//    gl.glColor4f(1,1,1,1);
+//
+//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+//     bgTexture.enable();
+//
+//      bgTexture.bind();
+//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+//      gl.glBegin(GL.GL_QUADS);
+//
+//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
+//      gl.glVertex3f(-2.0f, -2.0f, 2.0f);
+//      gl.glTexCoord2f(10, bgTexCoords.bottom());
+//      gl.glVertex3f(2.0f, -2.0f, 2.0f);
+//      gl.glTexCoord2f(10, 10);
+//      gl.glVertex3f(2.0f, 2.0f, 2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), 10);
+//      gl.glVertex3f(-2.0f, 2.0f, 2.0f);
+//      gl.glEnd();
+//      gl.glBegin(GL.GL_QUADS);
+//
+//      gl.glTexCoord2f(10, bgTexCoords.bottom());
+//      gl.glVertex3f(-2.0f, -2.0f, -2.0f);
+//      gl.glTexCoord2f(10, 10);
+//      gl.glVertex3f(-2.0f, 2.0f, -2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), 10);
+//      gl.glVertex3f(2.0f, 2.0f, -2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
+//      gl.glVertex3f(2.0f, -2.0f, -2.0f);
+//      gl.glEnd();
+//      gl.glBegin(GL.GL_QUADS);
+//
+//      gl.glTexCoord2f(bgTexCoords.left(), 10);
+//      gl.glVertex3f(-2.0f, 2.0f, -2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
+//      gl.glVertex3f(-2.0f, 2.0f, 2.0f);
+//      gl.glTexCoord2f(10, bgTexCoords.bottom());
+//      gl.glVertex3f(2.0f, 2.0f, 2.0f);
+//      gl.glTexCoord2f(10, 10);
+//      gl.glVertex3f(2.0f, 2.0f, -2.0f);
+//      gl.glEnd();
+//      gl.glBegin(GL.GL_QUADS);
+//
+//      gl.glTexCoord2f(10, 10);
+//      gl.glVertex3f(-2.0f, -2.0f, -2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), 10);
+//      gl.glVertex3f(2.0f, -2.0f, -2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
+//      gl.glVertex3f(2.0f, -2.0f, 2.0f);
+//      gl.glTexCoord2f(10, bgTexCoords.bottom());
+//      gl.glVertex3f(-2.0f, -2.0f, 2.0f);
+//      gl.glEnd();
+//      gl.glBegin(GL.GL_QUADS);
+//
+//      gl.glTexCoord2f(10, bgTexCoords.bottom());
+//      gl.glVertex3f(2.0f, -2.0f, -2.0f);
+//      gl.glTexCoord2f(10, 10);
+//      gl.glVertex3f(2.0f, 2.0f, -2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), 10);
+//      gl.glVertex3f(2.0f, 2.0f, 2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
+//      gl.glVertex3f(2.0f, -2.0f, 2.0f);
+//      gl.glEnd();
+//      gl.glBegin(GL.GL_QUADS);
+//
+//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
+//      gl.glVertex3f(-2.0f, -2.0f, -2.0f);
+//      gl.glTexCoord2f(10, bgTexCoords.bottom());
+//      gl.glVertex3f(-2.0f, -2.0f, 2.0f);
+//      gl.glTexCoord2f(10, 10);
+//      gl.glVertex3f(-2.0f, 2.0f, 2.0f);
+//      gl.glTexCoord2f(bgTexCoords.left(), 10);
+//      gl.glVertex3f(-2.0f, 2.0f, -2.0f);
+//
+//      gl.glEnd();
+//    gl.glPopAttrib();
+//    gl.glDisable(GL.GL_TEXTURE_2D);
+//    gl.glEnable(GL.GL_DEPTH_TEST);
+//    gl.glEnable(GL.GL_LIGHTING);
+//    gl.glEnable(GL.GL_BLEND);
+//    gl.glPopMatrix();
+//    }
 }
