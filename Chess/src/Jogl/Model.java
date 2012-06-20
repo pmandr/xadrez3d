@@ -4,9 +4,16 @@
  */
 package Jogl;
 
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureCoords;
+import com.sun.opengl.util.texture.TextureData;
+import com.sun.opengl.util.texture.TextureIO;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.glu.GLU;
 
 /**
  *
@@ -48,4 +55,6 @@ public class Model {
     public void draw(GLAutoDrawable drawable) {
         this.obj.draw(drawable);
     }
+    
+   
 }
