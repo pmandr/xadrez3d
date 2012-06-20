@@ -145,7 +145,7 @@ public class Jogl implements GLEventListener {
         if (Game.current_selected_position_1OF2 != null) {
             Game.drawCurrentPositionAndChildrenPositions(gl);
         }
-        DrawXYZAxis(gl);
+//        DrawXYZAxis(gl);
 
         //força o desenho das primitivas
         gl.glFlush();
@@ -160,7 +160,7 @@ public class Jogl implements GLEventListener {
         float[] ambient = {0.1f, 0.1f, 0.1f, 1.0f};
         float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
         float[] specular = new float[]{0.1f, 0.1f, 0.1f, 1.0f};
-//        float[] position = new float[]{30, 30, 300, 0.10f};
+//        float[] position = new float[]{8, 30, 8, 1.0f};
         float[] position = new float[]{-100.0f, 10.0f, 50.0f, 1.0f};
 
         // Define os parametros da luz de numero 0
