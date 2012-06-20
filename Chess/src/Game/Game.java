@@ -248,6 +248,8 @@ public class Game {
                         current_selected_position_1OF2 = new Point(row,col);
                         else if(!Game.getAlivePiece(row, col).is_white_colored() && player==2)
                             current_selected_position_1OF2 = new Point(row,col);
+                    first_piece_selected = Game.getAlivePiece((int)current_selected_position_1OF2.getX(), (int)current_selected_position_1OF2.getY());
+                    first_piece_selected.calculatePossibleMoves();
                     }
                  //tenta comer uma peca inimiga
                 if((Game.isEnemyPiece(Game.getAlivePiece(row, col)) &&
@@ -262,6 +264,7 @@ public class Game {
                     makeMove("simple_move");
                     }
                 }
+            
              }
     }
     public static Point getBoardPosition(Piece piece){
