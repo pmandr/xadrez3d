@@ -187,23 +187,31 @@ public class Jogl implements GLEventListener {
         float[] white = {1.0f, 1.0f, 1.0f, 1.0f};
         float[] red = {1.0f, 0.0f, 0.0f, 1.0f};
         float[] ambient = {0.1f, 0.1f, 0.1f, 1.0f};
-        float[] diffuse = new float[]{0.6f, 0.5f, 0.0f, 1.0f};
-        float[] specular = new float[]{0.6f, 0.1f, 0.1f, 1.0f};
+        float[] diffuse = new float[]{0.8f, 0.8f, 0.7f, 1.0f};
+        float[] specular = new float[]{0.6f, 0.5f, 0.6f, 1.0f};
 //        float[] position = new float[]{8, 30, 8, 1.0f};
-        float[] position = new float[]{-100.0f, 10.0f, 50.0f, 1.0f};
+        float[] position1 = new float[]{-100.0f, 10.0f, 50.0f, 1.0f};
+        float[] position2 = new float[]{100.0f, 10.0f, 51.0f, 1.0f};
 
         // Define os parametros da luz de numero 0
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, ambient, 0);
-        //gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, diffuse, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, diffuse, 0);
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, position, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, position1, 0);
+        
+        // Define os parametros da luz de numero 1
+        gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, ambient, 0);
+        gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, diffuse, 0);
+        gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, specular, 0);
+        gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, position2, 0);
 
         gl.glEnable(GL.GL_LIGHTING);
         gl.glEnable(GL.GL_COLOR_MATERIAL);
         gl.glEnable(GL.GL_LIGHT0);
+        gl.glEnable(GL.GL_LIGHT1);
 //        gl.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 0.25f);
 //        gl.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.25f);
-//        gl.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.01f);
+//        gl.glLightf(GL.GL_LIGHT1, GL.GL_QUADRATIC_ATTENUATION, 0.67f);
     }
 
     public void DrawXYZAxis(GL gl) {
