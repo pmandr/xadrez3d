@@ -38,6 +38,7 @@ public class Jogl implements GLEventListener {
     private static GLCanvas canvas;
     private static Listener listener = new Listener();
     private static MouseEvent mouse_event = null;
+    private static Texture bgTexture = null;
 
     public static void main(String[] args) throws IOException {
         Game.loadModels();
@@ -83,7 +84,7 @@ public class Jogl implements GLEventListener {
     }
 
     public void init(GLAutoDrawable drawable) {
-
+        load_texture();
         GL gl = drawable.getGL();
         glu = new GLU();
         System.err.println("INIT GL IS: " + gl.getClass().getName());
@@ -120,12 +121,34 @@ public class Jogl implements GLEventListener {
 
         //limpa o buffer
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
+        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glDisable(GL.GL_LIGHTING);
         width = drawable.getWidth();
         height = drawable.getHeight();
+        gl.glLoadIdentity();
+        //gl.glOrtho(1, 1, 0, 0, 0, 1);
+        gl.glTranslatef(-1,-1, 0);
+        gl.glScalef(2, 2, 0);
+        gl.glDisable(gl.GL_DEPTH_TEST);
+        bgTexture.enable();
+        bgTexture.bind();
+        gl.glBegin(GL.GL_QUADS);
+        //gl.glTranslatef(width, width, width);
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex2f(0, 0);
+        gl.glTexCoord2f(width, 0.0f); gl.glVertex2f(width, 0);
+        gl.glTexCoord2f(width, height); gl.glVertex2f(width, height);
+        gl.glTexCoord2f(0, height);  gl.glVertex2f(0, height);
+        gl.glEnd();
+        gl.glBegin(GL.GL_LINES);
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex2f(0, 0);
+        gl.glTexCoord2f(width, 0.0f); gl.glVertex2f(width, 0);
+        gl.glTexCoord2f(width, height); gl.glVertex2f(width, height);
+        gl.glTexCoord2f(0, height);  gl.glVertex2f(0, height);
+        gl.glEnd();
         gl.glViewport(0, 0, width, height);					// Reset The Current Viewport
-
+        gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glMatrixMode(GL.GL_PROJECTION);					// Select The Projection Matrix
+        gl.glEnable(GL.GL_LIGHTING);
         gl.glLoadIdentity();							// Reset The Projection Matrix
         glu.gluPerspective(45.0, (float) width / (float) height, 1, 50);
 //        drawbg(gl, glu);
@@ -164,15 +187,15 @@ public class Jogl implements GLEventListener {
         float[] white = {1.0f, 1.0f, 1.0f, 1.0f};
         float[] red = {1.0f, 0.0f, 0.0f, 1.0f};
         float[] ambient = {0.1f, 0.1f, 0.1f, 1.0f};
-        float[] diffuse = new float[]{0.8f, 0.8f, 0.8f, 1.0f};
-        float[] specular = new float[]{0.1f, 0.1f, 0.1f, 1.0f};
+        float[] diffuse = new float[]{0.6f, 0.5f, 0.0f, 1.0f};
+        float[] specular = new float[]{0.6f, 0.1f, 0.1f, 1.0f};
 //        float[] position = new float[]{8, 30, 8, 1.0f};
         float[] position = new float[]{-100.0f, 10.0f, 50.0f, 1.0f};
 
         // Define os parametros da luz de numero 0
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, ambient, 0);
         //gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, diffuse, 0);
-        //gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular, 0);
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, position, 0);
 
         gl.glEnable(GL.GL_LIGHTING);
@@ -198,7 +221,7 @@ public class Jogl implements GLEventListener {
         gl.glEnd();
 
         //Y Axis
-        rgba = new float[] {1.0f, 0.0f, 0f};
+        rgba = new float[]{1.0f, 0.0f, 0f};
         gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, rgba, 0);
         gl.glRasterPos3f(0.0f, 1.2f, 0.0f);
         glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_24, "y");
@@ -208,7 +231,7 @@ public class Jogl implements GLEventListener {
         gl.glEnd();
 
         //Z Axis
-        rgba = new float[] {0.0f, 0.0f, 1.0f};
+        rgba = new float[]{0.0f, 0.0f, 1.0f};
         gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, rgba, 0);
         gl.glRasterPos3f(0.0f, 0.0f, 1.2f);
         glut.glutBitmapString(GLUT.BITMAP_TIMES_ROMAN_24, "z");
@@ -290,115 +313,15 @@ public class Jogl implements GLEventListener {
                 break;
         }
     }
-//    private Texture bgTexture;
-//    private TextureCoords bgTexCoords;
-//    public void initbg() {
-//        try {
-//            InputStream stream = getClass().getResourceAsStream("/models/bg.jpg");
-//            TextureData data = TextureIO.newTextureData(stream, false, "jpg");
-//            bgTexture = TextureIO.newTexture(data);
-//        } catch (IOException exc) {
-//            System.out.println("Falha ao carregar a textura de mw.jpg");
-//            System.exit(1);
-//        }
-//         bgTexCoords = bgTexture.getImageTexCoords();
-//    }
-//
-//    public void drawbg(GL gl, GLU glu) {
-//
-//    gl.glPushMatrix();
-//
-//    gl.glLoadIdentity();
-//
-//       glu.gluLookAt(0, 0, 0, 3/100, 3/100, 3/100, 0, 1, 0);
-//
-//    gl.glPushAttrib(GL.GL_ENABLE_BIT);
-//    gl.glEnable(GL.GL_TEXTURE_2D);
-//    gl.glDisable(GL.GL_DEPTH_TEST);
-//    gl.glDisable(GL.GL_LIGHTING);
-//    gl.glDisable(GL.GL_BLEND);
-//
-//    gl.glColor4f(1,1,1,1);
-//
-//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
-//     bgTexture.enable();
-//
-//      bgTexture.bind();
-//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-//        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
-//      gl.glBegin(GL.GL_QUADS);
-//
-//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
-//      gl.glVertex3f(-2.0f, -2.0f, 2.0f);
-//      gl.glTexCoord2f(10, bgTexCoords.bottom());
-//      gl.glVertex3f(2.0f, -2.0f, 2.0f);
-//      gl.glTexCoord2f(10, 10);
-//      gl.glVertex3f(2.0f, 2.0f, 2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), 10);
-//      gl.glVertex3f(-2.0f, 2.0f, 2.0f);
-//      gl.glEnd();
-//      gl.glBegin(GL.GL_QUADS);
-//
-//      gl.glTexCoord2f(10, bgTexCoords.bottom());
-//      gl.glVertex3f(-2.0f, -2.0f, -2.0f);
-//      gl.glTexCoord2f(10, 10);
-//      gl.glVertex3f(-2.0f, 2.0f, -2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), 10);
-//      gl.glVertex3f(2.0f, 2.0f, -2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
-//      gl.glVertex3f(2.0f, -2.0f, -2.0f);
-//      gl.glEnd();
-//      gl.glBegin(GL.GL_QUADS);
-//
-//      gl.glTexCoord2f(bgTexCoords.left(), 10);
-//      gl.glVertex3f(-2.0f, 2.0f, -2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
-//      gl.glVertex3f(-2.0f, 2.0f, 2.0f);
-//      gl.glTexCoord2f(10, bgTexCoords.bottom());
-//      gl.glVertex3f(2.0f, 2.0f, 2.0f);
-//      gl.glTexCoord2f(10, 10);
-//      gl.glVertex3f(2.0f, 2.0f, -2.0f);
-//      gl.glEnd();
-//      gl.glBegin(GL.GL_QUADS);
-//
-//      gl.glTexCoord2f(10, 10);
-//      gl.glVertex3f(-2.0f, -2.0f, -2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), 10);
-//      gl.glVertex3f(2.0f, -2.0f, -2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
-//      gl.glVertex3f(2.0f, -2.0f, 2.0f);
-//      gl.glTexCoord2f(10, bgTexCoords.bottom());
-//      gl.glVertex3f(-2.0f, -2.0f, 2.0f);
-//      gl.glEnd();
-//      gl.glBegin(GL.GL_QUADS);
-//
-//      gl.glTexCoord2f(10, bgTexCoords.bottom());
-//      gl.glVertex3f(2.0f, -2.0f, -2.0f);
-//      gl.glTexCoord2f(10, 10);
-//      gl.glVertex3f(2.0f, 2.0f, -2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), 10);
-//      gl.glVertex3f(2.0f, 2.0f, 2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
-//      gl.glVertex3f(2.0f, -2.0f, 2.0f);
-//      gl.glEnd();
-//      gl.glBegin(GL.GL_QUADS);
-//
-//      gl.glTexCoord2f(bgTexCoords.left(), bgTexCoords.bottom());
-//      gl.glVertex3f(-2.0f, -2.0f, -2.0f);
-//      gl.glTexCoord2f(10, bgTexCoords.bottom());
-//      gl.glVertex3f(-2.0f, -2.0f, 2.0f);
-//      gl.glTexCoord2f(10, 10);
-//      gl.glVertex3f(-2.0f, 2.0f, 2.0f);
-//      gl.glTexCoord2f(bgTexCoords.left(), 10);
-//      gl.glVertex3f(-2.0f, 2.0f, -2.0f);
-//
-//      gl.glEnd();
-//    gl.glPopAttrib();
-//    gl.glDisable(GL.GL_TEXTURE_2D);
-//    gl.glEnable(GL.GL_DEPTH_TEST);
-//    gl.glEnable(GL.GL_LIGHTING);
-//    gl.glEnable(GL.GL_BLEND);
-//    gl.glPopMatrix();
-//    }
+
+    public void load_texture() {
+        try {
+            InputStream stream = getClass().getResourceAsStream("/models/texture.jpg");
+            TextureData data = TextureIO.newTextureData(stream, false, "jpg");
+            bgTexture = TextureIO.newTexture(data);
+        } catch (IOException exc) {
+            exc.printStackTrace();
+            System.exit(1);
+        }
+    }
 }
