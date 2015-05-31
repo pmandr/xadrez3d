@@ -1,0 +1,1 @@
+A chess game for educational purposes
